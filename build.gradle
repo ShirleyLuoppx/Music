@@ -4,3 +4,18 @@ plugins {
     id 'com.android.library' version '7.4.1' apply false
     id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
 }
+
+ext {
+    compileSdkVersion = 29
+    buildToolsVersion = "29.0.3"
+
+    minSdkVersion = 23
+    targetSdkVersion = 28
+    versionCode = 1
+    versionName = "1.0"
+
+
+    // App dependencies
+//    junitVersion = '4.12'
+//    v7Version='26.1.0'
+}
