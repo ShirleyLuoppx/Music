@@ -1,9 +1,4 @@
 pluginManagement {
-//    repositories {
-//        google()
-//        mavenCentral()
-//        gradlePluginPortal()
-//    }
     repositories {
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.aliyun.com/repository/releases' }
@@ -20,12 +15,22 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        maven { url "https://jitpack.io" }
+        maven { url 'https://maven.aliyun.com/repository/releases' }
+//        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
         google()
         mavenCentral()
     }
 }
+
+
 rootProject.name = "Music"
 include ':app'
+//implementation project(':ijkplayer-java')
 include ':ijkplayer-java'
 include ':ijkplayer-armv5'
 include ':ijkplayer-armv7a'
