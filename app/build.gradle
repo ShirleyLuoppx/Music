@@ -58,4 +58,12 @@ dependencies {
     implementation 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.8'
 //    # ExoPlayer as IMediaPlayer: optional, experimental
     implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
+
+    //okhttp3
+    // define a BOM and its version
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
+    // define any required OkHttp artifacts without version
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+
 }
