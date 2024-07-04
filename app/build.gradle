@@ -5,16 +5,16 @@ plugins {
 
 android {
     namespace 'com.ppx.music'
-    compileSdk 31
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        configurations.all {
+        configurations.configureEach {
             resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
         }
 
         applicationId "com.ppx.music"
-        minSdk 23
-        targetSdk 31
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
