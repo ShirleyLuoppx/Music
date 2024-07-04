@@ -9,9 +9,9 @@ import com.ppx.music.utils.LogUtils
 
 class MainActivity : AppCompatActivity() {
 
-//    lateinit var login:Login
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
     var netUtils= NetRequest()
+    private var phoneNumber :String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,18 +19,20 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        findViewById<Button>(R.id.btn_verify_code).setOnClickListener {
-            LogUtils.d("click btn.......")
+        binding.btnGetVerifyCode.setOnClickListener {
+            LogUtils.d("click btnGetVerifyCode btn.......")
 
             val internationalCode = binding.tvInternationalDialingCode.text.toString()
-            val phoneNumber = binding.etPhoneNumber.text.toString()
+            phoneNumber = binding.etPhoneNumber.text.toString()
             LogUtils.d("onCreate phoneNumber = $phoneNumber")
 
-//            login = Login()
-//            login.sendVerifyCodeByPhone(et.text.toString())
+            netUtils.sendVerifyCode(ApiConstants.sendVerifyCode,"phone",phoneNumber)
+        }
 
-//            netUtils.postString(ApiConstants.loginUrlByPhone,phoneNumber)
-            netUtils.postLoginForms(ApiConstants.loginUrl,"phone",phoneNumber)
+        binding.btnLogin.setOnClickListener {
+            val verifyCode =  binding.etVerifyCode.text.toString()
+            LogUtils.d("click btnLogin verifyCode = $verifyCode")
+            netUtils.checkVerifyCode(phoneNumber,verifyCode)
         }
 
         binding.btnLogout.setOnClickListener { logout() }
@@ -38,5 +40,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun logout(){
         netUtils.logout()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LogUtils.d("onDestroy")
     }
 }

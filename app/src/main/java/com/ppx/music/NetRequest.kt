@@ -2,6 +2,7 @@ package com.ppx.music
 
 import android.os.SystemClock
 import com.ppx.music.common.ApiConstants
+import com.ppx.music.common.Constants
 import com.ppx.music.utils.LogUtils
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -55,17 +56,55 @@ class NetRequest {
         })
     }
 
-    fun postLoginForms(apiUrl: String, key: String, value: String) {
+    fun sendVerifyCode(apiUrl: String, key: String, value: String) {
         val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add(key, value)
-            .add("timestamp", SystemClock.currentThreadTimeMillis().toString())
+            .add("timestamp", System.currentTimeMillis().toString())
             .build()
         LogUtils.d("postForms requestBody = $requestBody")
         LogUtils.d("postForms apiUrl = $apiUrl")
         LogUtils.d("postForms timestamp = "+System.currentTimeMillis())
         val request: Request = Request.Builder()
             .url(apiUrl)
+            .post(requestBody)
+            .build()
+
+        LogUtils.d("request.body = $request.body --- request.url=${request.url}")
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                LogUtils.d("onFailure: " + e.message)
+            }
+
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                LogUtils.d("response.protocol = " + response.protocol)
+                LogUtils.d((response.code).toString() + " " + response.message)
+                val headers = response.headers
+                for (i in 0 until headers.size) {
+                    LogUtils.d(headers.name(i) + ":" + headers.value(i))
+                }
+                LogUtils.d("onResponse: " + response.body!!.string())
+            }
+        })
+    }
+
+    /**
+     *
+     * /captcha/verify?phone=13xxx&captcha=1597
+     */
+    fun checkVerifyCode(phone :String,verifyCode :String){
+        val okHttpClient = OkHttpClient()
+        val requestBody: RequestBody = FormBody.Builder()
+            .add("phone", phone)
+            .add("captcha",verifyCode)
+            .add("timestamp", System.currentTimeMillis().toString())
+            .build()
+        LogUtils.d("postForms requestBody = $requestBody")
+        LogUtils.d("postForms timestamp = "+System.currentTimeMillis())
+        val request: Request = Request.Builder()
+            .url(ApiConstants.checkVerifyCodeUrl)
             .post(requestBody)
             .build()
 
