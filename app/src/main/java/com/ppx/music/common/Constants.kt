@@ -1,4 +1,4 @@
-package com.ppx.music.utils
+package com.ppx.music.common
 
 /**
  *

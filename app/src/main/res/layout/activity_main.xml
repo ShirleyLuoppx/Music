@@ -24,6 +24,7 @@
         app:layout_constraintTop_toTopOf="@id/tv_international_dialing_code"
         app:layout_constraintLeft_toRightOf="@id/tv_international_dialing_code"
         android:hint="请输入手机号"
+        android:text="8613527507647"
         android:layout_marginTop="-15dp"
         android:layout_marginStart="10dp"/>
 
@@ -36,5 +37,13 @@
         app:layout_constraintLeft_toLeftOf="@id/tv_international_dialing_code"
         app:layout_constraintRight_toRightOf="@id/et_phone_number"
         android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="退出登录"
+        app:layout_constraintTop_toBottomOf="@id/btn_verify_code"
+        app:layout_constraintLeft_toLeftOf="@id/btn_verify_code"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

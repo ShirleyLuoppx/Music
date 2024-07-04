@@ -3,31 +3,40 @@ package com.ppx.music
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
-import androidx.core.widget.addTextChangedListener
-import com.ppx.music.utils.ApiConstants
+import com.ppx.music.databinding.ActivityMainBinding
+import com.ppx.music.common.ApiConstants
 import com.ppx.music.utils.LogUtils
-import com.ppx.music.utils.Login
-import com.ppx.music.utils.NetUtils
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var login:Login
-
+//    lateinit var login:Login
+    lateinit var binding: ActivityMainBinding
+    var netUtils= NetRequest()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btn_verify_code).setOnClickListener {
+        binding = ActivityMainBinding.inflate(layoutInflater)
 
+        findViewById<Button>(R.id.btn_verify_code).setOnClickListener {
             LogUtils.d("click btn.......")
 
-            val et:EditText = findViewById(R.id.et_phone_number)
-            login = Login()
-            login.sendVerifyCodeByPhone(et.text.toString())
+            val internationalCode = binding.tvInternationalDialingCode.text.toString()
+            val phoneNumber = binding.etPhoneNumber.text.toString()
+            LogUtils.d("onCreate phoneNumber = $phoneNumber")
 
+//            login = Login()
+//            login.sendVerifyCodeByPhone(et.text.toString())
+
+//            netUtils.postString(ApiConstants.loginUrlByPhone,phoneNumber)
+            netUtils.postLoginForms(ApiConstants.loginUrl,"phone",phoneNumber)
         }
 
+        binding.btnLogout.setOnClickListener { logout() }
+    }
+
+    private fun logout(){
+        netUtils.logout()
     }
 }
