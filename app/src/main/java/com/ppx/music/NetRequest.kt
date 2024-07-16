@@ -1,13 +1,11 @@
 package com.ppx.music
 
-import android.os.SystemClock
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.utils.LogUtils
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.create
 import okio.IOException
-
 
 /**
  *
@@ -63,7 +61,7 @@ class NetRequest {
             .build()
         LogUtils.d("postForms requestBody = $requestBody")
         LogUtils.d("postForms apiUrl = $apiUrl")
-        LogUtils.d("postForms timestamp = "+System.currentTimeMillis())
+        LogUtils.d("postForms timestamp = " + System.currentTimeMillis())
         val request: Request = Request.Builder()
             .url(apiUrl)
             .post(requestBody)
@@ -86,7 +84,7 @@ class NetRequest {
                 }
                 LogUtils.d("onResponse: " + response.body!!.string())
 
-                if(response.code == 200){
+                if (response.code == 200) {
                     LogUtils.d("发送验证码成功！！！！！！！");
                 }
             }
@@ -103,9 +101,6 @@ class NetRequest {
             .add("captcha", verifyCode)
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
-        LogUtils.d("postForms requestBody = $requestBody")
-        LogUtils.d("postForms apiUrl = $apiUrl")
-        LogUtils.d("postForms timestamp = "+System.currentTimeMillis())
         val request: Request = Request.Builder()
             .url(apiUrl)
             .post(requestBody)
@@ -128,7 +123,7 @@ class NetRequest {
                 }
                 LogUtils.d("onResponse: " + response.body!!.string())
 
-                if(response.code == 200){
+                if (response.code == 200) {
                     LogUtils.d("验证码正确！！！！！！！")
                     //TODO：1、验证手机号码是否注册过，没注册跳注册界面，注册了就跳主界面获取数据
                 }
@@ -153,6 +148,43 @@ class NetRequest {
                 LogUtils.d("onResponse: " + response.body!!.string())
             }
         })
+    }
 
+    fun sendRequestWithOneParam(apiUrl: String, key: String, value: String) {
+        val okHttpClient = OkHttpClient()
+        val requestBody: RequestBody = FormBody.Builder()
+            .add(key, value)
+            .add("timestamp", System.currentTimeMillis().toString())
+            .build()
+        LogUtils.d("postForms requestBody = $requestBody")
+        LogUtils.d("postForms apiUrl = $apiUrl")
+        LogUtils.d("postForms timestamp = " + System.currentTimeMillis())
+        val request: Request = Request.Builder()
+            .url(apiUrl)
+            .post(requestBody)
+            .build()
+
+        LogUtils.d("request.body = $request.body --- request.url=${request.url}")
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                LogUtils.d("onFailure: " + e.message)
+            }
+
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                LogUtils.d("response.protocol = " + response.protocol)
+                LogUtils.d((response.code).toString() + " " + response.message)
+                val headers = response.headers
+                for (i in 0 until headers.size) {
+                    LogUtils.d(headers.name(i) + ":" + headers.value(i))
+                }
+                LogUtils.d("onResponse: " + response.body!!.string())
+
+                if (response.code == 200) {
+                    LogUtils.d("发送验证码成功！！！！！！！");
+                }
+            }
+        })
     }
 }
