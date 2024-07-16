@@ -3,15 +3,16 @@ package com.ppx.music
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
+import androidx.core.widget.addTextChangedListener
 import com.ppx.music.databinding.ActivityMainBinding
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.utils.LogUtils
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
     var netUtils= NetRequest()
-    private var phoneNumber :String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,20 +20,24 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        binding.btnGetVerifyCode.setOnClickListener {
-            LogUtils.d("click btnGetVerifyCode btn.......")
+        findViewById<Button>(R.id.btn_verify_code).setOnClickListener {
+            LogUtils.d("click btn.......")
 
-            val internationalCode = binding.tvInternationalDialingCode.text.toString()
-            phoneNumber = binding.etPhoneNumber.text.toString()
-            LogUtils.d("onCreate phoneNumber = $phoneNumber")
-
+            val phoneNumber = binding.etPhoneNumber.text.toString()
+            LogUtils.d("click sendVerifyCode and phoneNumber = $phoneNumber")
             netUtils.sendVerifyCode(ApiConstants.sendVerifyCode,"phone",phoneNumber)
         }
 
-        binding.btnLogin.setOnClickListener {
-            val verifyCode =  binding.etVerifyCode.text.toString()
-            LogUtils.d("click btnLogin verifyCode = $verifyCode")
-            netUtils.checkVerifyCode(phoneNumber,verifyCode)
+        val etVerifyCode = findViewById<EditText>(R.id.et_verify_code)
+
+
+        findViewById<Button>(R.id.btn_login).setOnClickListener {
+            val phoneNumber = binding.etPhoneNumber.text.toString()
+            LogUtils.d("click btnLogin and phoneNumber = $phoneNumber")
+            val verifyCode = etVerifyCode.text.toString()
+            LogUtils.d("click btnLogin and verifyCode = $verifyCode")
+
+            netUtils.checkVerifyCode(ApiConstants.checkVerifyCode,phoneNumber,verifyCode)
         }
 
         binding.btnLogout.setOnClickListener { logout() }
@@ -40,10 +45,5 @@ class MainActivity : AppCompatActivity() {
 
     private fun logout(){
         netUtils.logout()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        LogUtils.d("onDestroy")
     }
 }

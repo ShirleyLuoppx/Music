@@ -2,7 +2,6 @@ package com.ppx.music
 
 import android.os.SystemClock
 import com.ppx.music.common.ApiConstants
-import com.ppx.music.common.Constants
 import com.ppx.music.utils.LogUtils
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -86,25 +85,29 @@ class NetRequest {
                     LogUtils.d(headers.name(i) + ":" + headers.value(i))
                 }
                 LogUtils.d("onResponse: " + response.body!!.string())
+
+                if(response.code == 200){
+                    LogUtils.d("发送验证码成功！！！！！！！");
+                }
             }
         })
     }
 
     /**
-     *
-     * /captcha/verify?phone=13xxx&captcha=1597
+     * 验证验证码是否正确
      */
-    fun checkVerifyCode(phone :String,verifyCode :String){
+    fun checkVerifyCode(apiUrl: String, phoneValue: String, verifyCode: String) {
         val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
-            .add("phone", phone)
-            .add("captcha",verifyCode)
+            .add("phone", phoneValue)
+            .add("captcha", verifyCode)
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
         LogUtils.d("postForms requestBody = $requestBody")
+        LogUtils.d("postForms apiUrl = $apiUrl")
         LogUtils.d("postForms timestamp = "+System.currentTimeMillis())
         val request: Request = Request.Builder()
-            .url(ApiConstants.checkVerifyCodeUrl)
+            .url(apiUrl)
             .post(requestBody)
             .build()
 
@@ -124,6 +127,11 @@ class NetRequest {
                     LogUtils.d(headers.name(i) + ":" + headers.value(i))
                 }
                 LogUtils.d("onResponse: " + response.body!!.string())
+
+                if(response.code == 200){
+                    LogUtils.d("验证码正确！！！！！！！")
+                    //TODO：1、验证手机号码是否注册过，没注册跳注册界面，注册了就跳主界面获取数据
+                }
             }
         })
     }
