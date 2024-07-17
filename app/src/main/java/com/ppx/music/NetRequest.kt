@@ -1,5 +1,6 @@
 package com.ppx.music
 
+import android.util.Log
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.utils.LogUtils
 import okhttp3.*
@@ -42,28 +43,67 @@ class NetRequest {
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                LogUtils.d("onResponse: response.protocol = " + response.protocol)
-                LogUtils.d("onResponse:" + (response.code).toString() + " " + response.message)
+                LogUtils.d("1onResponse: response.protocol = " + response.protocol)
+                LogUtils.d("2onResponse:" + (response.code).toString() + " " + response.message)
                 val headers: Headers = response.headers
                 for (i in 0 until headers.size) {
-                    LogUtils.d("onResponse:" + headers.name(i) + ":" + headers.value(i))
+                    LogUtils.d("3onResponse:" + headers.name(i) + ":" + headers.value(i))
                 }
-                LogUtils.d("onResponse: " + response.body?.string())
+                LogUtils.d("4onResponse: " + response.body?.string())
             }
         })
     }
 
-    fun sendVerifyCode(apiUrl: String, key: String, value: String) {
+    //检测手机号码是否已注册
+    fun checkPhone(phoneValue: String) {
         val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
-            .add(key, value)
+            .add("phone", phoneValue)
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
-        LogUtils.d("postForms requestBody = $requestBody")
-        LogUtils.d("postForms apiUrl = $apiUrl")
-        LogUtils.d("postForms timestamp = " + System.currentTimeMillis())
         val request: Request = Request.Builder()
-            .url(apiUrl)
+            .url(ApiConstants.checkPhoneIsRegisted)
+            .post(requestBody)
+            .build()
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                LogUtils.d("onFailure: " + e.message)
+            }
+
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                LogUtils.d("response.protocol = " + response.protocol)
+                LogUtils.d((response.code).toString() + " " + response.message)
+                val headers = response.headers
+                for (i in 0 until headers.size) {
+                    LogUtils.d(headers.name(i) + ":" + headers.value(i))
+                }
+                LogUtils.d("onResponse: " + response.body!!.string())
+
+                //注册过
+                if (response.code == 200) {
+                    LogUtils.d("current phone: $phoneValue is registered")
+
+                    // 发送验证码
+                    sendVerifyCode(phoneValue)
+                } else if(response.code == 400){
+                    //未注册过
+                    LogUtils.d("current phone: $phoneValue is not registered,please register first...")
+                    //跳注册界面
+                }
+            }
+        })
+    }
+
+    fun sendVerifyCode(value: String) {
+        val okHttpClient = OkHttpClient()
+        val requestBody: RequestBody = FormBody.Builder()
+            .add("phone", value)
+            .add("timestamp", System.currentTimeMillis().toString())
+            .build()
+        val request: Request = Request.Builder()
+            .url(ApiConstants.sendVerifyCode)
             .post(requestBody)
             .build()
 
@@ -85,7 +125,9 @@ class NetRequest {
                 LogUtils.d("onResponse: " + response.body!!.string())
 
                 if (response.code == 200) {
-                    LogUtils.d("发送验证码成功！！！！！！！");
+                    LogUtils.d("发送验证码成功！！！！！！！")
+                }else{
+                    LogUtils.d("发送验证码失败！")
                 }
             }
         })
@@ -106,11 +148,100 @@ class NetRequest {
             .post(requestBody)
             .build()
 
-        LogUtils.d("request.body = $request.body --- request.url=${request.url}")
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                LogUtils.d("checkVerifyCode onFailure: " + e.message)
+            }
+
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                LogUtils.d("checkVerifyCode onResponse: " + response.body!!.string())
+
+                if (response.code == 200) {
+                    LogUtils.d("验证码正确！！！！！！！")
+                    //TODO:获取数据
+                    val userId = getUserIdByNickName("oldsportox")
+                    getUserDetail(userId)
+                }else{
+                    LogUtils.d("验证码错误！")
+                }
+            }
+        })
+    }
+
+    /**
+     * 根据用户昵称获取用户id
+     *    /get/userids?nicknames=binaryify
+     */
+    fun getUserIdByNickName(nickName: String) :String {
+        val userId = ""
+        val okHttpClient = OkHttpClient()
+        val request: Request = Request.Builder()
+            .url(ApiConstants.getUserIdByNickName+"?nicknames="+nickName)
+            .get() //默认就是GET请求，可以不写
+            .build()
+        val call = okHttpClient.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                LogUtils.d( "getUserIdByNickName onFailure: ")
+            }
+
+            @Throws(java.io.IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                LogUtils.d("getUserIdByNickName onResponse: " + response.body!!.string())
+
+//                onResponse: {"data":{"code":200,"account":{"id":9863116836,"userName":"1000_587A66E61231998ECCB52FC5B0A86AFE21B6080C29E31C20C5E7","type":1000,"status":-10,"whitelistAuthority":0,"createTime":1714450278796,"tokenVersion":0,"ban":0,"baoyueVersion":0,"donateVersion":0,"vipType":0,"anonimousUser":true,"paidFee":false},"profile":null}}
+            }
+        })
+
+        return userId
+    }
+
+    /**
+     * 获取用户详情
+     * /user/detail?uid=32953014
+     */
+    fun getUserDetail(uid:String){
+        val okHttpClient = OkHttpClient()
+        val requestBody: RequestBody = FormBody.Builder()
+            .add("uid", uid)
+            .add("timestamp", System.currentTimeMillis().toString())
+            .build()
+        val request: Request = Request.Builder()
+            .url(ApiConstants.getUserDetail)
+            .post(requestBody)
+            .build()
+
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                LogUtils.d("getUserDetail onFailure: " + e.message)
+            }
+
+            @Throws(IOException::class)
+            override fun onResponse(call: Call, response: Response) {
+                LogUtils.d("getUserDetail onResponse: " + response.body!!.string())
+            }
+        })
+    }
+
+    /**
+     * 获取登录状态
+     */
+    fun getLoginStatus(): Boolean {
+        var result = false
+        val okHttpClient = OkHttpClient()
+        val requestBody: RequestBody = FormBody.Builder()
+            .add("timestamp", System.currentTimeMillis().toString())
+            .build()
+        val request: Request = Request.Builder()
+            .url(ApiConstants.loginStatus)
+            .post(requestBody)
+            .build()
 
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: java.io.IOException) {
                 LogUtils.d("onFailure: " + e.message)
+                result = false
             }
 
             @Throws(IOException::class)
@@ -122,13 +253,11 @@ class NetRequest {
                     LogUtils.d(headers.name(i) + ":" + headers.value(i))
                 }
                 LogUtils.d("onResponse: " + response.body!!.string())
-
-                if (response.code == 200) {
-                    LogUtils.d("验证码正确！！！！！！！")
-                    //TODO：1、验证手机号码是否注册过，没注册跳注册界面，注册了就跳主界面获取数据
-                }
+                result = true
             }
         })
+
+        return result
     }
 
     fun logout() {
