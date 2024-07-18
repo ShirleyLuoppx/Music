@@ -1,12 +1,18 @@
 package com.ppx.music
 
-import android.util.Log
+import android.os.Build.VERSION_CODES.P
+import com.alibaba.fastjson.JSON
 import com.ppx.music.common.ApiConstants
+import com.ppx.music.common.Constants
+import com.ppx.music.common.SPKey
+import com.ppx.music.model.ResponseInfo
 import com.ppx.music.utils.LogUtils
+import com.ppx.music.utils.SPUtils
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.create
 import okio.IOException
+import org.json.JSONObject
 
 /**
  *
@@ -62,7 +68,7 @@ class NetRequest {
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
         val request: Request = Request.Builder()
-            .url(ApiConstants.checkPhoneIsRegisted)
+            .url(ApiConstants.CHECK_PHONE_IS_REGISTED)
             .post(requestBody)
             .build()
 
@@ -87,7 +93,7 @@ class NetRequest {
 
                     // 发送验证码
                     sendVerifyCode(phoneValue)
-                } else if(response.code == 400){
+                } else if (response.code == 400) {
                     //未注册过
                     LogUtils.d("current phone: $phoneValue is not registered,please register first...")
                     //跳注册界面
@@ -103,7 +109,7 @@ class NetRequest {
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
         val request: Request = Request.Builder()
-            .url(ApiConstants.sendVerifyCode)
+            .url(ApiConstants.SEND_VERIFY_CODE)
             .post(requestBody)
             .build()
 
@@ -126,7 +132,7 @@ class NetRequest {
 
                 if (response.code == 200) {
                     LogUtils.d("发送验证码成功！！！！！！！")
-                }else{
+                } else {
                     LogUtils.d("发送验证码失败！")
                 }
             }
@@ -136,7 +142,7 @@ class NetRequest {
     /**
      * 验证验证码是否正确
      */
-    fun checkVerifyCode(apiUrl: String, phoneValue: String, verifyCode: String) {
+    fun checkVerifyCode(phoneValue: String, verifyCode: String) {
         val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add("phone", phoneValue)
@@ -144,7 +150,7 @@ class NetRequest {
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
         val request: Request = Request.Builder()
-            .url(apiUrl)
+            .url(ApiConstants.CHECK_VERIFY_CODE)
             .post(requestBody)
             .build()
 
@@ -161,8 +167,7 @@ class NetRequest {
                     LogUtils.d("验证码正确！！！！！！！")
                     //TODO:获取数据
                     val userId = getUserIdByNickName("oldsportox")
-                    getUserDetail(userId)
-                }else{
+                } else {
                     LogUtils.d("验证码错误！")
                 }
             }
@@ -173,24 +178,46 @@ class NetRequest {
      * 根据用户昵称获取用户id
      *    /get/userids?nicknames=binaryify
      */
-    fun getUserIdByNickName(nickName: String) :String {
-        val userId = ""
+    fun getUserIdByNickName(nickName: String): Int {
+        var userId = -1
         val okHttpClient = OkHttpClient()
         val request: Request = Request.Builder()
-            .url(ApiConstants.getUserIdByNickName+"?nicknames="+nickName)
+            .url(ApiConstants.GET_USERID_BY_NICKNAME + "?nicknames=" + nickName)
             .get() //默认就是GET请求，可以不写
             .build()
         val call = okHttpClient.newCall(request)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: java.io.IOException) {
-                LogUtils.d( "getUserIdByNickName onFailure: ")
+                LogUtils.d("getUserIdByNickName onFailure: ")
             }
 
             @Throws(java.io.IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                LogUtils.d("getUserIdByNickName onResponse: " + response.body!!.string())
+//                LogUtils.d("getUserIdByNickName onResponse: " + response.body!!.string())
 
-//                onResponse: {"data":{"code":200,"account":{"id":9863116836,"userName":"1000_587A66E61231998ECCB52FC5B0A86AFE21B6080C29E31C20C5E7","type":1000,"status":-10,"whitelistAuthority":0,"createTime":1714450278796,"tokenVersion":0,"ban":0,"baoyueVersion":0,"donateVersion":0,"vipType":0,"anonimousUser":true,"paidFee":false},"profile":null}}
+                val responseBody = response.body
+                if(responseBody!=null){
+
+                    //okhttp3请求回调中response.body().string()只能有效调用一次，而我使用了两次，所以在第二次时调用时提示已关闭流的异常
+                    val jsonObject = JSONObject(responseBody.string())
+                    val code = jsonObject.opt("code")
+                    LogUtils.d("getUserIdByNickName onResponse: code = $code")
+
+                    if (code == Constants.CODE_SUCCESS) {
+                        val nicknames = jsonObject.opt("nicknames")
+                        if (nicknames != null) {
+                            val nnJsonObject = JSONObject(nicknames.toString())
+                            userId = nnJsonObject.opt(nickName)?.toString()?.toInt() ?: -1
+                            LogUtils.d("getUserIdByNickName onResponse: userId = $userId")
+
+                            SPUtils.instance.setIntValue(SPKey.USER_ID, userId)
+                            SPUtils.instance.setStringValue(SPKey.NICKNAME, "oldsportox")
+
+                            //跳转界面MineActivity
+                            getUserDetail(userId)
+                        }
+                    }
+                }
             }
         })
 
@@ -199,27 +226,25 @@ class NetRequest {
 
     /**
      * 获取用户详情
-     * /user/detail?uid=32953014
+     * /user/detail?uid=32953014                //9863116836
      */
-    fun getUserDetail(uid:String){
-        val okHttpClient = OkHttpClient()
-        val requestBody: RequestBody = FormBody.Builder()
-            .add("uid", uid)
-            .add("timestamp", System.currentTimeMillis().toString())
-            .build()
-        val request: Request = Request.Builder()
-            .url(ApiConstants.getUserDetail)
-            .post(requestBody)
+    fun getUserDetail(uid: Int) {
+
+        val request:Request = Request.Builder()
+            .url(ApiConstants.GET_USER_DETAIL + "?uid=" + uid)
+            .get()
             .build()
 
-        okHttpClient.newCall(request).enqueue(object : Callback {
+        val okHttpClient = OkHttpClient()
+        okHttpClient.newCall(request).enqueue(object :Callback{
             override fun onFailure(call: Call, e: java.io.IOException) {
                 LogUtils.d("getUserDetail onFailure: " + e.message)
             }
 
-            @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
                 LogUtils.d("getUserDetail onResponse: " + response.body!!.string())
+
+//                getUserDetail onResponse: {"level":9,"listenSongs":11863,"userPoint":{"userId":494817816,"balance":0,"updateTime":1721284783993,"version":10,"status":0,"blockBalance":0},"mobileSign":false,"pcSign":false,"profile":{"privacyItemUnlimit":{"area":true,"college":true,"gender":true,"age":true,"villageAge":true},"avatarDetail":null,"avatarImgId":109951163458530620,"birthday":631123200000,"gender":2,"nickname":"oldsportox","createTime":1495961634838,"avatarImgIdStr":"109951163458530620","backgroundImgIdStr":"109951162868126486","authStatus":0,"detailDescription":"","experts":{},"expertTags":null,"userType":0,"djStatus":0,"accountStatus":0,"province":500000,"city":500101,"defaultAvatar":false,"avatarUrl":"http://p1.music.126.net/gFEOIU18GBQnydv-XZ5aKA==/109951163458530620.jpg","backgroundImgId":109951162868126480,"backgroundUrl":"http://p1.music.126.net/_f8R60U9mZ42sSNvdPn2sQ==/109951162868126486.jpg","vipType":0,"mutual":false,"followed":false,"remarkName":null,"description":"","userId":494817816,"signature":"321","authority":0,"followeds":8,"follows":21,"blacklist":false,"eventCount":0,"allSubscribedCount":0,"playlistBeSubscribedCount":0,"followTime":null,"followMe":false,"artistIdentity":[],"cCount":0,"inBlacklist":false,"sDJPCount":0,"playlistCount":7,"sCount":0,"newFollows":21},"peopleCanSeeMyPlayRecord":true,"bindings":[{"url":"","expiresIn":2147483647,"refreshTime":1495961627,"bindingTime":1495961627747,"tokenJsonStr":null,"expired":false,"userId":494817816,"id":3128212070,"type":1},{"url":"","expiresIn":7776000,"refreshTime":1558402381,"bindingTime":1495961597884,"tokenJsonStr":null,"expired":true,"userId":494817816,"id":3128212071,"type":5}],"adValid":true,"code":200,"newUser":false,"recallUser":false,"createTime":1495961634838,"createDays":2608,"profileVillageInfo":{"title":"领取村民证","imageUrl":null,"targetUrl":"https://sg.music.163.com/g/cloud-card-2?nm_style=sbt&market=personal"}}
             }
         })
     }
@@ -234,7 +259,7 @@ class NetRequest {
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
         val request: Request = Request.Builder()
-            .url(ApiConstants.loginStatus)
+            .url(ApiConstants.LOGIN_STATUS)
             .post(requestBody)
             .build()
 
@@ -248,12 +273,31 @@ class NetRequest {
             override fun onResponse(call: Call, response: Response) {
                 LogUtils.d("response.protocol = " + response.protocol)
                 LogUtils.d((response.code).toString() + " " + response.message)
-                val headers = response.headers
-                for (i in 0 until headers.size) {
-                    LogUtils.d(headers.name(i) + ":" + headers.value(i))
-                }
                 LogUtils.d("onResponse: " + response.body!!.string())
                 result = true
+
+                //                onResponse: {"data":{"code":200,"account":{"id":9863116836,"userName":"1000_587A66E61231998ECCB52FC5B0A86AFE21B6080C29E31C20C5E7","type":1000,"status":-10,"whitelistAuthority":0,"createTime":1714450278796,"tokenVersion":0,"ban":0,"baoyueVersion":0,"donateVersion":0,"vipType":0,"anonimousUser":true,"paidFee":false},"profile":null}}
+//                onResponse: {
+//                        "data": {
+//                        "code": 200,
+//                            "account": {
+//                            "id": 9863116836,
+//                            "userName": "1000_587A66E61231998ECCB52FC5B0A86AFE21B6080C29E31C20C5E7",
+//                            "type": 1000,
+//                            "status": -10,
+//                            "whitelistAuthority": 0,
+//                            "createTime": 1714450278796,
+//                            "tokenVersion": 0,
+//                            "ban": 0,
+//                            "baoyueVersion": 0,
+//                            "donateVersion": 0,
+//                            "vipType": 0,
+//                            "anonimousUser": true,
+//                            "paidFee": false
+//                        },
+//                        "profile": null
+//                    }
+//                }
             }
         })
 
@@ -263,7 +307,7 @@ class NetRequest {
     fun logout() {
         val okHttpClient = OkHttpClient()
         val request: Request = Request.Builder()
-            .url(ApiConstants.logoutUrl)
+            .url(ApiConstants.LOGOUT_URL)
             .get() //默认就是GET请求，可以不写
             .build()
         val call = okHttpClient.newCall(request)

@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
             val verifyCode =  binding.etVerifyCode.text.toString()
             LogUtils.d("click btnLogin and verifyCode = $verifyCode")
 
-            netUtils.checkVerifyCode(ApiConstants.checkVerifyCode,phoneNumber,verifyCode)
+            netUtils.checkVerifyCode(phoneNumber,verifyCode)
         }
 
         binding.btnLogout.setOnClickListener { logout() }

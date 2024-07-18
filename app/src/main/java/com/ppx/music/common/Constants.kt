@@ -9,5 +9,15 @@ package com.ppx.music.common
 class Constants {
     companion object {
         var TAG = "Music"
+
+        var CODE_SUCCESS = 200
+//        var CODE_FAIL = 400
+    }
+}
+
+class SPKey {
+    companion object {
+        var USER_ID = "user_id"
+        var NICKNAME = "nickname"
     }
 }
