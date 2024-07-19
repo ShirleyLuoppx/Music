@@ -2,6 +2,7 @@ package com.ppx.music.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.ppx.music.NetRequest
 import com.ppx.music.R
 
 /**
@@ -15,8 +16,14 @@ import com.ppx.music.R
  */
 class MineActivity : AppCompatActivity(){
 
+    private val netRequest = NetRequest()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mine)
+
+        intent.getIntExtra("userId",-1).let { userId ->
+            netRequest.getUserDetail(userId)
+        }
     }
 }
