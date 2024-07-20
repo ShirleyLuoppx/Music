@@ -17,7 +17,7 @@
         android:usesCleartextTraffic="true"
         android:name=".MusicApplication">
         <activity
-            android:name=".view.MainActivity"
+            android:name=".view.MineActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.LoginActivity"/>
-        <activity android:name=".view.MineActivity"/>
+<!--        <activity android:name=".view.MineActivity"/>-->
     </application>
 
 

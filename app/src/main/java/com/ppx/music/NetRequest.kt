@@ -2,6 +2,7 @@ package com.ppx.music
 
 import android.content.Intent
 import android.os.Build.VERSION_CODES.P
+import androidx.core.view.ContentInfoCompat.Flags
 import com.alibaba.fastjson.JSON
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.common.Constants
@@ -141,40 +142,7 @@ class NetRequest {
         })
     }
 
-    /**
-     * 验证验证码是否正确
-     */
-    fun checkVerifyCode(phoneValue: String, verifyCode: String) {
-        val okHttpClient = OkHttpClient()
-        val requestBody: RequestBody = FormBody.Builder()
-            .add("phone", phoneValue)
-            .add("captcha", verifyCode)
-            .add("timestamp", System.currentTimeMillis().toString())
-            .build()
-        val request: Request = Request.Builder()
-            .url(ApiConstants.CHECK_VERIFY_CODE)
-            .post(requestBody)
-            .build()
 
-        okHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: java.io.IOException) {
-                LogUtils.d("checkVerifyCode onFailure: " + e.message)
-            }
-
-            @Throws(IOException::class)
-            override fun onResponse(call: Call, response: Response) {
-                LogUtils.d("checkVerifyCode onResponse: " + response.body!!.string())
-
-                if (response.code == 200) {
-                    LogUtils.d("验证码正确！！！！！！！")
-                    //TODO:获取数据
-                    val userId = getUserIdByNickName("oldsportox")
-                } else {
-                    LogUtils.d("验证码错误！")
-                }
-            }
-        })
-    }
 
     /**
      * 根据用户昵称获取用户id
@@ -191,37 +159,14 @@ class NetRequest {
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: java.io.IOException) {
                 LogUtils.d("getUserIdByNickName onFailure: ")
+                iNetCallBack.onFailure(call, e)
             }
 
             @Throws(java.io.IOException::class)
             override fun onResponse(call: Call, response: Response) {
 //                LogUtils.d("getUserIdByNickName onResponse: " + response.body!!.string())
 
-                val responseBody = response.body
-                if(responseBody!=null){
-
-                    //okhttp3请求回调中response.body().string()只能有效调用一次，而我使用了两次，所以在第二次时调用时提示已关闭流的异常
-                    val jsonObject = JSONObject(responseBody.string())
-                    val code = jsonObject.opt("code")
-                    LogUtils.d("getUserIdByNickName onResponse: code = $code")
-
-                    if (code == Constants.CODE_SUCCESS) {
-                        val nicknames = jsonObject.opt("nicknames")
-                        if (nicknames != null) {
-                            val nnJsonObject = JSONObject(nicknames.toString())
-                            userId = nnJsonObject.opt(nickName)?.toString()?.toInt() ?: -1
-                            LogUtils.d("getUserIdByNickName onResponse: userId = $userId")
-
-                            SPUtils.instance.setIntValue(SPKey.USER_ID, userId)
-                            SPUtils.instance.setStringValue(SPKey.NICKNAME, "oldsportox")
-
-                            //跳转界面MineActivity
-                            val intent = Intent(MusicApplication.context, MineActivity::class.java)
-                            intent.putExtra("userId", userId)
-                            MusicApplication.context.startActivity(intent)
-                        }
-                    }
-                }
+                iNetCallBack.onSuccess(call,response)
             }
         })
 
@@ -243,12 +188,12 @@ class NetRequest {
         okHttpClient.newCall(request).enqueue(object :Callback{
             override fun onFailure(call: Call, e: java.io.IOException) {
                 LogUtils.d("getUserDetail onFailure: " + e.message)
+                iNetCallBack.onFailure(call,e)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 LogUtils.d("getUserDetail onResponse: " + response.body!!.string())
-
-
+                iNetCallBack.onSuccess(call, response)
             }
         })
     }
@@ -373,29 +318,15 @@ class NetRequest {
         client.newCall(request).enqueue(callback)
     }
 
-    fun sendPostRequest(address: String, vararg params :String,callback: Callback) {
+    interface INetCallBack {
+        fun onFailure(call: Call, e: java.io.IOException)
 
-        params.forEach {
-            LogUtils.d(it)
+        fun onSuccess(call: Call, response: Response)
+    }
 
-        }
-
-        val requestBody = FormBody.Builder()
-            .add("timestamp", System.currentTimeMillis().toString())
-            .add()
-            .build()
-//        val request = Request.Builder()
-//            .url(address)
-//            .post(requestBody)
-//            .build()
-//        client.newCall(request).enqueue(callback)
-
-
-        val client = OkHttpClient()
-        val request = Request.Builder()
-            .url(address)
-            .put(requestBody)
-            .build()
-        client.newCall(request).enqueue(callback)
+    lateinit var iNetCallBack: INetCallBack
+    fun setOnNetCallBack(callBack: INetCallBack){
+        iNetCallBack = callBack
     }
 }
+
