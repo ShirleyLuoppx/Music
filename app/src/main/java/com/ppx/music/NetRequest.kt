@@ -10,7 +10,6 @@ import com.ppx.music.common.SPKey
 import com.ppx.music.model.ResponseInfo
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.SPUtils
-import com.ppx.music.view.MineActivity
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.create

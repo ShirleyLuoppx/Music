@@ -1,42 +1,90 @@
 package com.ppx.music.view
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
 import android.os.Bundle
-import com.ppx.music.NetRequest
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentTransaction
+import com.ppx.music.R
 import com.ppx.music.databinding.ActivityMainBinding
-import com.ppx.music.utils.LogUtils
 
-/**
- *
- * @Author Shirley
- * @Date：2024/7/17
- * @Desc：首页-flash页面
- */
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private var netUtils = NetRequest()
+    lateinit var binding: ActivityMainBinding
+    private lateinit var recommendFragment: RecommendFragment
+    private lateinit var findFragment: FindFragment
+    private lateinit var mineFragment: MineFragment
+    private lateinit var tvRecommend: TextView
+    private lateinit var tvFind: TextView
+    private lateinit var tvMine: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        initFragment()
+        selectFragment(0)
+        initListener()
+    }
 
-        binding.tvJumpLogin.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
+    private fun initFragment() {
+        recommendFragment = RecommendFragment()
+        findFragment = FindFragment()
+        mineFragment = MineFragment()
 
-        binding.tvGetLoginStatus.setOnClickListener {
-            val loginStatus = netUtils.getLoginStatus()
-            LogUtils.d("loginStatus = $loginStatus")
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.add(R.id.framelayout, recommendFragment)
+        fragmentTransaction.add(R.id.framelayout, findFragment)
+        fragmentTransaction.add(R.id.framelayout, mineFragment)
+        fragmentTransaction.commit()
+    }
 
-            if (loginStatus) {
-                binding.tvGetLoginStatus.text = "已登录"
-            } else {
-                binding.tvGetLoginStatus.text = "未登录"
+    @SuppressLint("ResourceAsColor")
+    private fun selectFragment(index: Int) {
+        val transaction = supportFragmentManager.beginTransaction()
+        tvRecommend = binding.include.tvRecommend
+        tvFind = binding.include.tvFind
+        tvMine = binding.include.tvMine
+
+        hideFragment(transaction)
+
+        when (index) {
+            0 -> {
+                transaction.show(recommendFragment)
+                tvRecommend.setTextColor(R.color.teal_200)
+                tvFind.setTextColor(R.color.black)
+                tvMine.setTextColor(R.color.black)
+            }
+
+            1 -> {
+                transaction.show(findFragment)
+                tvRecommend.setTextColor(R.color.black)
+                tvFind.setTextColor(R.color.teal_200)
+                tvMine.setTextColor(R.color.black)
+            }
+
+            2 -> {
+                transaction.show(mineFragment)
+                tvRecommend.setTextColor(R.color.black)
+                tvFind.setTextColor(R.color.black)
+                tvMine.setTextColor(R.color.teal_200)
             }
         }
+        transaction.commit()
+    }
+
+    private fun hideFragment(transaction: FragmentTransaction) {
+        transaction.hide(recommendFragment)
+        transaction.hide(findFragment)
+        transaction.hide(mineFragment)
+    }
+
+    private fun initListener() {
+        tvRecommend.setOnClickListener {
+            selectFragment(0)
+        }
+        tvFind.setOnClickListener { selectFragment(1) }
+        tvMine.setOnClickListener { selectFragment(2) }
     }
 }

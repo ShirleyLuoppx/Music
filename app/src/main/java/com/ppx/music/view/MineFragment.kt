@@ -1,17 +1,16 @@
 package com.ppx.music.view
 
-import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.alibaba.fastjson.JSON
-import com.alibaba.fastjson.JSONObject
-import com.ppx.music.NetRequest
 import com.ppx.music.R
 import com.ppx.music.common.ApiConstants
-import com.ppx.music.databinding.ActivityLoginBinding
-import com.ppx.music.databinding.ActivityMineBinding
+import com.ppx.music.databinding.FragmentMineBinding
 import com.ppx.music.utils.LogUtils
 import okhttp3.Call
 import okhttp3.Callback
@@ -20,30 +19,28 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
-/**
- *
- * @Author Shirley
- * @Date：2024/7/17
- * @Desc：我的-个人中心
- *
- * TODO:暂时先写成activity  后面换成单fragment，多activity的模式
- * TODO:后面可以加一个BaseActivity 可以统一管理activity
- * TODO:子线程网络请求
- */
-class MineActivity : AppCompatActivity() {
+class MineFragment : Fragment() {
 
-    private lateinit var binding: ActivityMineBinding
-    private val netRequest = NetRequest()
+    private lateinit var binding: FragmentMineBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_mine);
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_mine, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initData()
+    }
+
+    private fun initData() {
         val userId = 494817816
         getUserDetail(userId)
-
-
-
     }
 
     /**
@@ -65,16 +62,16 @@ class MineActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
                 LogUtils.d("getUserDetailsInfo onResponse")
 
-                runOnUiThread {
+                requireActivity().runOnUiThread {
                     val body = response.body!!.string()
                     LogUtils.d("getUserDetail onResponse: $body")
 
                     val json = JSON.parseObject(body)
 
                     val level = json["level"].toString()
-                    val tvLevel:TextView =binding.tvLevel
+                    val tvLevel: TextView = binding.tvLevel
                     tvLevel.text = level
-                    findViewById<TextView>(R.id.tv_level).text = level
+                    binding.tvLevel.text = level
                     LogUtils.d("getUserDetailsInfo onSuccess level = $level")
 
                     val profileObj = json.getJSONObject("profile")
@@ -82,7 +79,7 @@ class MineActivity : AppCompatActivity() {
                     val gender = profileObj["gender"].toString()
                     LogUtils.d("getUserDetailsInfo onSuccess gender = $gender")
 
-                    val tvUserId :TextView = binding.tvUserId
+                    val tvUserId: TextView = binding.tvUserId
                     tvUserId.text = profileObj["userId"].toString()
                     LogUtils.d("getUserDetailsInfo onSuccess tvUserId = $tvUserId")
 

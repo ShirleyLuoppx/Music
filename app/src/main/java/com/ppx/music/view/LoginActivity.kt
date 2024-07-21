@@ -213,9 +213,9 @@ class LoginActivity : AppCompatActivity() {
                             SPUtils.instance.setIntValue(SPKey.USER_ID, userId)
                             SPUtils.instance.setStringValue(SPKey.NICKNAME, "oldsportox")
 
-                            //跳转界面MineActivity
+                            //跳转界面首页
                             val intent =
-                                Intent(MusicApplication.context, MineActivity::class.java)
+                                Intent(MusicApplication.context, MainActivity::class.java)
                             intent.putExtra("userId", userId)
                             startActivity(intent)
                         }
