@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.ppx.music.R
 
-class FindFragment : Fragment(){
+class FindFragment : BaseFragment(){
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -16,4 +16,8 @@ class FindFragment : Fragment(){
     ): View? {
         return inflater.inflate(R.layout.fragment_find,container,false)
     }
+
+//    override fun setLayoutId():Int {
+//        return R.layout.fragment_find
+//    }
 }

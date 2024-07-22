@@ -41,5 +41,7 @@ class ApiConstants {
         //可是，如果直接登录，不走注册流程的话，用户的nickName没有接口去获取？  只能直接写入自己的nickName吗，这样不科学.....
         const val GET_USERID_BY_NICKNAME = "$HTTP_URL/get/userids"
 
+        //每日推荐歌曲    /recommend/songs
+        const val GET_DAILY_RECOMMEND_SONGS = "$HTTP_URL/recommend/songs"
     }
 }
