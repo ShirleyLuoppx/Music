@@ -59,25 +59,11 @@ class RecommendFragment : Fragment() {
 
             //转到DailyRecommendFragment
             val dailyRecommendFragment = DailyRecommendFragment()
-
-//            val fragmentTransaction = fragmentManager?.beginTransaction()
-//            fragmentTransaction?.add(R.id.fl_recommend, dailyRecommendFragment)
-//            fragmentTransaction?.commit()
-//
-//
-//            val transaction = fragmentManager?.beginTransaction()
-//            transaction?.hide(this)
-//            transaction?.show(dailyRecommendFragment)
-//            transaction?.commit()
-
             activity?.supportFragmentManager?.beginTransaction()
-                ?.replace(R.id.fl_recommend, dailyRecommendFragment)
-                ?.hide(this)
+                ?.replace(R.id.framelayout, dailyRecommendFragment)
                 ?.addToBackStack(null)
                 ?.commit()
-
         }
-
     }
 
 

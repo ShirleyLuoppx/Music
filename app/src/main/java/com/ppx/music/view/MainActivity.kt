@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentTransaction
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityMainBinding
+import com.ppx.music.utils.LogUtils
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,11 +34,12 @@ class MainActivity : AppCompatActivity() {
         findFragment = FindFragment()
         mineFragment = MineFragment()
 
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-        fragmentTransaction.add(R.id.framelayout, recommendFragment)
-        fragmentTransaction.add(R.id.framelayout, findFragment)
-        fragmentTransaction.add(R.id.framelayout, mineFragment)
-        fragmentTransaction.commit()
+//        val fragmentTransaction = supportFragmentManager.beginTransaction()
+//        fragmentTransaction.add(R.id.framelayout, recommendFragment)
+//        fragmentTransaction.add(R.id.framelayout, findFragment)
+//        fragmentTransaction.add(R.id.framelayout, mineFragment)
+//        fragmentTransaction.addToBackStack(null)
+//        fragmentTransaction.commit()
     }
 
     @SuppressLint("ResourceAsColor")
@@ -47,30 +49,32 @@ class MainActivity : AppCompatActivity() {
         tvFind = binding.include.tvFind
         tvMine = binding.include.tvMine
 
-        hideFragment(transaction)
-
         when (index) {
             0 -> {
-                transaction.show(recommendFragment)
-                tvRecommend.setTextColor(R.color.teal_200)
-                tvFind.setTextColor(R.color.black)
-                tvMine.setTextColor(R.color.black)
+
+                transaction.replace(R.id.framelayout, recommendFragment)
+                LogUtils.d("recommendFragment index =0 .....tvRecommend = $tvRecommend")
+                tvRecommend.setTextColor(resources.getColor(R.color.red))
+                tvFind.setTextColor(resources.getColor(R.color.black))
+                tvMine.setTextColor(resources.getColor(R.color.black))
             }
 
-            1 -> {
-                transaction.show(findFragment)
-                tvRecommend.setTextColor(R.color.black)
-                tvFind.setTextColor(R.color.teal_200)
-                tvMine.setTextColor(R.color.black)
+             1 -> {
+                transaction.replace(R.id.framelayout, findFragment)
+                tvRecommend.setTextColor(resources.getColor(R.color.black))
+                tvFind.setTextColor(resources.getColor(R.color.red))
+                tvMine.setTextColor(resources.getColor(R.color.black))
             }
 
             2 -> {
-                transaction.show(mineFragment)
-                tvRecommend.setTextColor(R.color.black)
-                tvFind.setTextColor(R.color.black)
-                tvMine.setTextColor(R.color.teal_200)
+                transaction.replace(R.id.framelayout, mineFragment)
+                tvRecommend.setTextColor(resources.getColor(R.color.black))
+                tvFind.setTextColor(resources.getColor(R.color.black))
+                tvMine.setTextColor(resources.getColor(R.color.red))
             }
         }
+
+        transaction.addToBackStack(null)
         transaction.commit()
     }
 
@@ -81,9 +85,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initListener() {
-        tvRecommend.setOnClickListener {
-            selectFragment(0)
-        }
+        tvRecommend.setOnClickListener { selectFragment(0) }
         tvFind.setOnClickListener { selectFragment(1) }
         tvMine.setOnClickListener { selectFragment(2) }
     }
