@@ -14,12 +14,16 @@ import com.ppx.music.common.ApiConstants
 import com.ppx.music.common.Constants
 import com.ppx.music.databinding.FragmentDailyRecommendBinding
 import com.ppx.music.model.SongDetailInfo
+import com.ppx.music.player.MediaService
 import com.ppx.music.utils.LogUtils
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.Response
+import java.io.IOException
 
 /**
  *
@@ -73,7 +77,7 @@ class DailyRecommendFragment : Fragment() {
                     if (data.size > 0) {
                         activity?.runOnUiThread {
                             dailyRecommendAdapter.addAll(data)
-                            dailyRecommendAdapter.notifyDataSetChanged()
+//                            dailyRecommendAdapter.notifyDataSetChanged()
                         }
                     }
                 }
@@ -105,6 +109,10 @@ class DailyRecommendFragment : Fragment() {
                 val songName = jsonObject["name"].toString()
                 LogUtils.d("onResponse : songName = $songName")
 
+                //歌曲id
+                val songId = jsonObject["id"].toString()
+                LogUtils.d("onResponse : songId = $songId")
+
                 //歌手名
                 val ar = jsonObject["ar"].toString()
                 val arArray = JSONObject.parseArray(ar)
@@ -122,7 +130,7 @@ class DailyRecommendFragment : Fragment() {
                 val picUrl = alObj["picUrl"].toString()
                 val alName = alObj["name"].toString()
 
-                val songDetailInfo = SongDetailInfo(-1, songName, singersList, alName, picUrl)
+                val songDetailInfo = SongDetailInfo(songId, songName, singersList, alName, picUrl)
                 songsInfoList.add(songDetailInfo)
 
 
@@ -143,11 +151,59 @@ class DailyRecommendFragment : Fragment() {
         binding.rvDailyRecommend.adapter = dailyRecommendAdapter
 
         dailyRecommendAdapter.setOnItemClickListener { adapter, view, position ->
-            LogUtils.d("onItemClick $position")
+            val clickSongDetailInfo = adapter.getItem(position)
+            val clickSongId = clickSongDetailInfo?.songId
+            LogUtils.d("onItemClick $position and clickSongId = $clickSongId")
+            if (clickSongId != null) {
+                getSongUrlById(clickSongId)
+            }
+
         }
+    }
+
+    private fun getSongUrlById(id: String) {
+        val requestBody = FormBody.Builder()
+            .add("id",id)
+            .build()
+        val okHttpClient = OkHttpClient()
+        val request = Request.Builder()
+            .url(ApiConstants.GET_URL_BY_SONG_ID)
+            .post(requestBody)
+            .build()
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                LogUtils.d("getSongUrlById onFailure")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string()
+                LogUtils.d("getSongUrlById onResponse body = $bodyStr")
+
+                val jsonObjectStr = JSONObject.parseObject(bodyStr)
+                val dataStr = jsonObjectStr["data"].toString()
+                val dataArray= JSONObject.parseArray(dataStr)
+                if(dataArray.size>0){
+                    val data = dataArray[0].toString()
+                    val dataObj = JSONObject.parseObject(data)
+                    val url = dataObj["url"].toString()
+                    LogUtils.d("getSongUrlById url = $url")
+
+
+                    MediaService.startPlay(context!!,url)
+
+
+                }else{
+                    LogUtils.d("getSongUrlById dataArray.size = 0")
+                }
+            }
+
+        })
+
     }
 
     private fun initListener() {
 
+
     }
+
 }

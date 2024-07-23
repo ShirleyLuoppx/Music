@@ -5,10 +5,12 @@ import android.net.Uri
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.chad.library.adapter4.BaseQuickAdapter
 import com.chad.library.adapter4.viewholder.QuickViewHolder
 import com.ppx.music.R
 import com.ppx.music.model.SongDetailInfo
+import com.ppx.music.utils.LogUtils
 
 /**
  *
@@ -18,6 +20,10 @@ import com.ppx.music.model.SongDetailInfo
  */
 class DailyRecommendAdapter : BaseQuickAdapter<SongDetailInfo, QuickViewHolder>() {
     override fun onBindViewHolder(holder: QuickViewHolder, position: Int, item: SongDetailInfo?) {
+
+        LogUtils.d("====================")
+
+
         // 设置item数据
         val tvSongName : TextView = holder.getView(R.id.tv_song_name)
         val tvSingerName : TextView = holder.getView(R.id.tv_singer_name)
@@ -25,7 +31,9 @@ class DailyRecommendAdapter : BaseQuickAdapter<SongDetailInfo, QuickViewHolder>(
         val ivAlbumPic : ImageView = holder.getView(R.id.iv_album_pic)
         tvSongName.text = item?.songName
         tvAlbumName.text = item?.songAlbum
-        ivAlbumPic.setImageURI(Uri.parse(item?.picUrl))
+        Glide.with(context).load(item?.picUrl).into(ivAlbumPic)
+
+//        ivAlbumPic.setImageURI(Uri.parse(item?.picUrl))
 
         val singerNamesStr = StringBuilder()
         item?.songArtists?.forEach {

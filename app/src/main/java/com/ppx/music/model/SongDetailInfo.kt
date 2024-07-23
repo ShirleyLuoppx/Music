@@ -184,7 +184,7 @@ package com.ppx.music.model
 //            },
 
 data class SongDetailInfo(
-    val songId:Int,
+    val songId:String,
     val songName:String,
     val songArtists:ArrayList<String>,
     val songAlbum:String,

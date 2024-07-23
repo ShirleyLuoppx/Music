@@ -43,5 +43,8 @@ class ApiConstants {
 
         //每日推荐歌曲    /recommend/songs
         const val GET_DAILY_RECOMMEND_SONGS = "$HTTP_URL/recommend/songs"
+
+        //通过歌曲id获取歌曲的url
+        const val GET_URL_BY_SONG_ID = "$HTTP_URL/song/url"
     }
 }
