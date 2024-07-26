@@ -28,9 +28,6 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
 
     }
 
-//    public static void startPlay(Context context, String uri) {
-//        context.startService(new Intent(context, MediaService.class).putExtra(PLAY_URI, uri).setAction(PLAY));
-//    }
 //
 //    //继续播放、若已发生暂停
 //    public static void continuePlay(Context context) {

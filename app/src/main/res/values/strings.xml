@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Music</string>
+
+    <string name="daily_recommend">每日推荐</string>
 </resources>
