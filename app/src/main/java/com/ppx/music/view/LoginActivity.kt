@@ -3,8 +3,11 @@ package com.ppx.music.view
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
+import androidx.databinding.DataBindingUtil.setContentView
 import com.ppx.music.MusicApplication
 import com.ppx.music.NetRequest
+import com.ppx.music.R
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.common.Constants
 import com.ppx.music.common.SPKey
@@ -27,17 +30,14 @@ import java.io.IOException
  * @Date：2024/7/17
  * @Desc：登录界面
  */
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity<ActivityLoginBinding>(){
 
-    private lateinit var binding: ActivityLoginBinding
     private var netUtils = NetRequest()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun initView() {
+    }
 
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
+    override fun initListener() {
         binding.btnGetVerifyCode.setOnClickListener {
             LogUtils.d("click btn.......")
 
@@ -57,6 +57,13 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.btnLogout.setOnClickListener { logout() }
+    }
+
+    override fun initData() {
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.activity_login
     }
 
     private fun logout() {

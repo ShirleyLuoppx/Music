@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import com.ppx.music.utils.LogUtils
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import tv.danmaku.ijk.media.player.IMediaPlayer.OnErrorListener
@@ -13,7 +12,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer.OnPreparedListener
 class MediaService : Service() ,OnErrorListener,OnPreparedListener {
 
     //ijkplayer
-    private lateinit var ijkAudioPlayer: IjkAudioPlayer
+    private lateinit var ijkAudioPlayer: IjkPlayer
 
 
 
@@ -56,10 +55,10 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
         super.onCreate()
 
 //        if (ijkAudioPlayer == null) {
-            ijkAudioPlayer = IjkAudioPlayer()
+            ijkAudioPlayer = IjkPlayer()
             ijkAudioPlayer.init()
-            ijkAudioPlayer.player.setOnErrorListener(this)
-            ijkAudioPlayer.player.setOnPreparedListener(this)
+            ijkAudioPlayer.getPlayer()?.setOnErrorListener(this)
+            ijkAudioPlayer.getPlayer()?.setOnPreparedListener(this)
 //        }
 
     }
