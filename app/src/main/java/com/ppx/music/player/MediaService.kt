@@ -13,7 +13,7 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
 
     //ijkplayer
     private lateinit var ijkAudioPlayer: IjkPlayer
-
+    private val TAG = "MediaService"
 
 
     companion object {
@@ -54,6 +54,8 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
     override fun onCreate() {
         super.onCreate()
 
+
+        LogUtils.d("$TAG   onCreate")
 //        if (ijkAudioPlayer == null) {
             ijkAudioPlayer = IjkPlayer()
             ijkAudioPlayer.init()
@@ -65,7 +67,9 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+        LogUtils.d("$TAG onStartCommand")
         val uri = intent?.getStringExtra(PLAY_URI)
+        LogUtils.d("$TAG onStartCommand uri = $uri")
         ijkAudioPlayer.setPathAndPrepare(uri)
         ijkAudioPlayer.start()
 

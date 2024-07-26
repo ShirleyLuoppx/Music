@@ -1,6 +1,7 @@
 package com.ppx.music.player
 
 import android.media.AudioManager
+import com.ppx.music.utils.LogUtils
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import java.io.IOException
 
@@ -12,12 +13,15 @@ import java.io.IOException
  */
 class IjkPlayer {
     private var ijkMediaPlayer: IjkMediaPlayer? = null
+    private val TAG = "IjkPlayer"
 
     fun getPlayer(): IjkMediaPlayer? {
         return ijkMediaPlayer
     }
 
     fun init() {
+        LogUtils.d("$TAG   init")
+        LogUtils.d("$TAG   ijkMediaPlayer = $ijkMediaPlayer")
         if (ijkMediaPlayer == null) {
             ijkMediaPlayer = IjkMediaPlayer()
             ijkMediaPlayer!!.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "soundtouch", 0)
@@ -34,6 +38,9 @@ class IjkPlayer {
     }
 
     fun setPathAndPrepare(uri: String?) {
+        LogUtils.d("$TAG setPathAndPrepare")
+        LogUtils.d("$TAG uri = $uri")
+        LogUtils.d("$TAG ijkMediaPlayer = $ijkMediaPlayer")
         try {
             ijkMediaPlayer!!.dataSource = uri
             ijkMediaPlayer!!.prepareAsync()
@@ -43,6 +50,8 @@ class IjkPlayer {
     }
 
     fun start() {
+        LogUtils.d("$TAG start")
+        LogUtils.d("$TAG ijkMediaPlayer = $ijkMediaPlayer")
         if (ijkMediaPlayer != null) {
             ijkMediaPlayer!!.start()
         }
