@@ -6,18 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.ppx.music.R
+import com.ppx.music.databinding.FragmentFindBinding
 
-class FindFragment : BaseFragment(){
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_find,container,false)
+class FindFragment : BaseFragment<FragmentFindBinding>(){
+    override fun initView() {
     }
 
-//    override fun setLayoutId():Int {
-//        return R.layout.fragment_find
-//    }
+    override fun initListener() {
+    }
+
+    override fun initData() {
+    }
+
+    override fun getLayoutId(): Int {
+        return  R.layout.fragment_find
+    }
 }

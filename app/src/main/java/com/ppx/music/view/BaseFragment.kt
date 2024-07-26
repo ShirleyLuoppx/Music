@@ -5,44 +5,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import com.ppx.music.baseinterface.base
 
 /**
  *
  * @Author Shirley
  * @Date：2024/7/22
- * @Desc：TODO: 这个没搞清楚咋写的，回去找个GitHub 的demo看看
+ * @Desc：
  */
-open class BaseFragment :Fragment(), base {
+abstract class BaseFragment<V:ViewDataBinding> : Fragment() {
 
-    private lateinit var binding: androidx.databinding.ViewDataBinding
+    lateinit var binding: V
     private var layoutId:Int = 0
+
+    abstract fun initView()
+    abstract fun initListener()
+    abstract fun initData()
+    abstract fun getLayoutId(): Int
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, setLayoutId(), container, false)
-        return super.onCreateView(inflater, container, savedInstanceState)
+        binding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initView()
+        initListener()
+        initData()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-    }
 
-    override fun setLayoutId(): Int {
-        return setLayoutId()
-    }
-
-    override fun initData() {
-    }
-
-    override fun initListener() {
+        binding.unbind()
     }
 }

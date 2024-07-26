@@ -1,12 +1,6 @@
 package com.ppx.music.view
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import com.alibaba.fastjson.JSON
 import com.ppx.music.R
 import com.ppx.music.common.ApiConstants
@@ -19,28 +13,21 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
-class MineFragment : Fragment() {
+class MineFragment : BaseFragment<FragmentMineBinding>() {
 
-    private lateinit var binding: FragmentMineBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_mine, container, false)
-        return binding.root
+    override fun initView() {
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initData()
+    override fun initListener() {
     }
 
-    private fun initData() {
+    override fun initData() {
         val userId = 494817816
         getUserDetail(userId)
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_mine
     }
 
     /**

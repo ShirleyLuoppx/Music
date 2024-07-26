@@ -31,29 +31,37 @@ import java.io.IOException
  * @Date：2024/7/22
  * @Desc：每日推荐
  */
-class DailyRecommendFragment : Fragment() {
+class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
-    private lateinit var binding: FragmentDailyRecommendBinding
     private val songsInfoList = ArrayList<SongDetailInfo>()
     val dailyRecommendAdapter = DailyRecommendAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_daily_recommend, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        getDailyRecommendSongs()
+    override fun initView() {
         initRv()
+    }
+
+    override fun initListener() {
+
+        dailyRecommendAdapter.setOnItemClickListener { adapter, view, position ->
+            val clickSongDetailInfo = adapter.getItem(position)
+            val clickSongId = clickSongDetailInfo?.songId
+            LogUtils.d("onItemClick $position and clickSongId = $clickSongId")
+            if (clickSongId != null) {
+                getSongUrlById(clickSongId)
+            }
+
+        }
+    }
+
+    override fun initData() {
+        getDailyRecommendSongs()
 
     }
+
+    override fun getLayoutId(): Int {
+        return  R.layout.fragment_daily_recommend
+    }
+
 
     private fun getDailyRecommendSongs() {
         val okHttpClient = OkHttpClient()
@@ -145,20 +153,10 @@ class DailyRecommendFragment : Fragment() {
     private fun initRv() {
         LogUtils.d("initRv songsInfoList size = ${songsInfoList.size}")
         val layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
-
-        dailyRecommendAdapter.addAll(songsInfoList)
         binding.rvDailyRecommend.layoutManager = layoutManager
         binding.rvDailyRecommend.adapter = dailyRecommendAdapter
 
-        dailyRecommendAdapter.setOnItemClickListener { adapter, view, position ->
-            val clickSongDetailInfo = adapter.getItem(position)
-            val clickSongId = clickSongDetailInfo?.songId
-            LogUtils.d("onItemClick $position and clickSongId = $clickSongId")
-            if (clickSongId != null) {
-                getSongUrlById(clickSongId)
-            }
-
-        }
+//        dailyRecommendAdapter.addAll(songsInfoList)
     }
 
     private fun getSongUrlById(id: String) {
@@ -201,9 +199,6 @@ class DailyRecommendFragment : Fragment() {
 
     }
 
-    private fun initListener() {
 
-
-    }
 
 }
