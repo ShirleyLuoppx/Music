@@ -1,5 +1,8 @@
 package com.ppx.music.model
 
+import android.os.Parcel
+import android.os.Parcelable
+
 
 //        "dailySongs": [
 //            {
@@ -184,9 +187,82 @@ package com.ppx.music.model
 //            },
 
 data class SongDetailInfo(
-    val songId:String,
-    val songName:String,
-    val songArtists:ArrayList<String>,
-    val songAlbum:String,
-    val picUrl:String
-)
+    val songId: String = "",
+    val songName: String = "",
+    val songArtists: ArrayList<String> = ArrayList(),
+    val songAlbum: String = "",
+    val picUrl: String = "",
+    val songVipStatus: SongVipStatus = SongVipStatus.FREE,
+    val songTime: Long = 0
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.createStringArrayList() ?: ArrayList<String>(),
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readParcelable(SongVipStatus::class.java.classLoader) ?: SongVipStatus.FREE,
+        parcel.readLong() ?: 0
+    )
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(songId)
+        dest.writeString(songName)
+        dest.writeStringList(songArtists)
+        dest.writeString(songAlbum)
+        dest.writeString(picUrl)
+        dest.writeParcelable(songVipStatus, flags)
+        dest.writeLong(songTime)
+    }
+
+    companion object CREATOR : Parcelable.Creator<SongDetailInfo> {
+        override fun createFromParcel(parcel: Parcel): SongDetailInfo {
+            return SongDetailInfo(parcel)
+        }
+
+        override fun newArray(size: Int): Array<SongDetailInfo?> {
+            return arrayOfNulls(size)
+        }
+    }
+
+}
+
+/**
+ * //    free: Int = 0,
+ * //    vip: Int = 1,
+ * //    buyAlbum: Int = 4,
+ * //    allCouldPlay: Int = 8
+ */
+public enum class SongVipStatus : Parcelable {
+    FREE,
+    VIP,
+    BUY_ALBUM,
+    ALL_CAN_PLAY;
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeInt(ordinal)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<SongVipStatus> {
+        override fun createFromParcel(source: Parcel?): SongVipStatus {
+            return values()[source?.readInt()!!]
+        }
+
+        override fun newArray(size: Int): Array<SongVipStatus?> {
+            return arrayOfNulls(size)
+        }
+
+    }
+}
+
+
+
+

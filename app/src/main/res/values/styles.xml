@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--圆角样式-->
+    <style name="roundStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">75dp</item>
+    </style>
+</resources>

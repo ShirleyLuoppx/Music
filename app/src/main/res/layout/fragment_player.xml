@@ -45,16 +45,17 @@
             app:layout_constraintTop_toBottomOf="@id/iv_share" />
 
         <!--        唱片机图片-->
-        <ImageView
-            android:id="@+id/iv_music_rotate_img"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="200dp"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/spi_music_rotate"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="110dp"
+            android:scaleType="centerCrop"
             android:src="@mipmap/ic_launcher_round"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+            app:shapeAppearanceOverlay="@style/roundStyle" />
 
         <!--        歌曲信息-->
         <TextView
@@ -62,10 +63,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="50dp"
             android:hint="I'm So Sorry"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_music_rotate_img" />
+            app:layout_constraintTop_toBottomOf="@id/spi_music_rotate" />
 
         <TextView
             android:id="@+id/tv_singer_name"
@@ -152,37 +153,37 @@
             android:id="@+id/iv_pre_song"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginStart="57dp"
+            android:layout_marginStart="50dp"
+            android:src="@mipmap/ic_prev"
             app:layout_constraintLeft_toRightOf="@id/iv_loop_mode"
-            app:layout_constraintTop_toTopOf="@id/iv_loop_mode"
-            android:src="@mipmap/ic_prev"/>
+            app:layout_constraintTop_toTopOf="@id/iv_loop_mode" />
 
         <ImageView
             android:id="@+id/iv_play_song"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginStart="57dp"
+            android:layout_marginStart="50dp"
+            android:src="@mipmap/ic_pause"
             app:layout_constraintLeft_toRightOf="@id/iv_pre_song"
-            app:layout_constraintTop_toTopOf="@id/iv_loop_mode"
-            android:src="@mipmap/ic_pause"/>
+            app:layout_constraintTop_toTopOf="@id/iv_loop_mode" />
 
         <ImageView
             android:id="@+id/iv_next_song"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginStart="57dp"
+            android:layout_marginStart="50dp"
+            android:src="@mipmap/ic_next"
             app:layout_constraintLeft_toRightOf="@id/iv_play_song"
-            app:layout_constraintTop_toTopOf="@id/iv_loop_mode"
-            android:src="@mipmap/ic_next"/>
+            app:layout_constraintTop_toTopOf="@id/iv_loop_mode" />
 
         <ImageView
             android:id="@+id/iv_playing_song_list"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginStart="57dp"
+            android:layout_marginStart="50dp"
+            android:src="@mipmap/ic_list"
             app:layout_constraintLeft_toRightOf="@id/iv_next_song"
-            app:layout_constraintTop_toTopOf="@id/iv_loop_mode"
-            android:src="@mipmap/ic_list"/>
+            app:layout_constraintTop_toTopOf="@id/iv_loop_mode" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

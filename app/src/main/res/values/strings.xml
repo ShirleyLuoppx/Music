@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">Music</string>
 
-<<<<<<< HEAD
     <string name="daily_recommend">每日推荐</string>
-=======
-
     <string name="membership_has_expired">会员已过期</string>
     <string name="logout">退出登录</string>
     <string name="shift_account">切换账号</string>
@@ -14,5 +11,4 @@
     <string name="vip">VIP</string>
     <string name="renewal">续费</string>
 
->>>>>>> fc10e3a2bddac8932b8f45a162b5032f198b7ac8
 </resources>

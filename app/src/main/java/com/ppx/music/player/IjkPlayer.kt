@@ -43,6 +43,7 @@ class IjkPlayer {
         LogUtils.d("$TAG ijkMediaPlayer = $ijkMediaPlayer")
         try {
             ijkMediaPlayer!!.dataSource = uri
+            ijkMediaPlayer!!.stop()
             ijkMediaPlayer!!.prepareAsync()
         } catch (e: IOException) {
             e.printStackTrace()

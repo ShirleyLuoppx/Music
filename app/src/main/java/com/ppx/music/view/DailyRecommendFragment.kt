@@ -1,11 +1,6 @@
 package com.ppx.music.view
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
+import android.content.Intent
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONObject
 import com.ppx.music.R
@@ -14,16 +9,13 @@ import com.ppx.music.common.ApiConstants
 import com.ppx.music.common.Constants
 import com.ppx.music.databinding.FragmentDailyRecommendBinding
 import com.ppx.music.model.SongDetailInfo
-import com.ppx.music.player.MediaService
+import com.ppx.music.model.SongVipStatus
 import com.ppx.music.utils.LogUtils
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.Response
-import java.io.IOException
 
 /**
  *
@@ -46,9 +38,21 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
             val clickSongDetailInfo = adapter.getItem(position)
             val clickSongId = clickSongDetailInfo?.songId
             LogUtils.d("onItemClick $position and clickSongId = $clickSongId")
-            if (clickSongId != null) {
+
+            //跳转到播放页面
+//            val transaction = activity?.supportFragmentManager?.beginTransaction()
+//            transaction?.replace(R.id.framelayout,this)
+//            transaction?.commit()
+
+            val intent = Intent(requireActivity(), PlayerActivity::class.java)
+//            val clickSongDetailInfo = songsInfoList[position]
+            intent.putExtra("clickSongDetailInfo",clickSongDetailInfo)
+//            intent.putExtra("clickSongId", clickSongDetailInfo)
+            startActivity(intent)
+
+            /*if (clickSongId != null) {
                 getSongUrlById(clickSongId)
-            }
+            }*/
 
         }
     }
@@ -59,7 +63,7 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
     }
 
     override fun getLayoutId(): Int {
-        return  R.layout.fragment_daily_recommend
+        return R.layout.fragment_daily_recommend
     }
 
 
@@ -137,8 +141,16 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
                 val alObj = JSONObject.parseObject(alStr)
                 val picUrl = alObj["picUrl"].toString()
                 val alName = alObj["name"].toString()
+                //是否是会员歌曲
+                val fee = jsonObject["fee"].toString()
+                val songVipStatus = initSongVipStatus(fee)
+                //歌曲时间 毫秒
+                val songTime = jsonObject["dt"].toString().toLong()
 
-                val songDetailInfo = SongDetailInfo(songId, songName, singersList, alName, picUrl)
+                //点赞数量
+                //讨论数量
+
+                val songDetailInfo = SongDetailInfo(songId, songName, singersList, alName, picUrl,songVipStatus,songTime)
                 songsInfoList.add(songDetailInfo)
 
 
@@ -159,46 +171,35 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 //        dailyRecommendAdapter.addAll(songsInfoList)
     }
 
-    private fun getSongUrlById(id: String) {
-        val requestBody = FormBody.Builder()
-            .add("id",id)
-            .build()
-        val okHttpClient = OkHttpClient()
-        val request = Request.Builder()
-            .url(ApiConstants.GET_URL_BY_SONG_ID)
-            .post(requestBody)
-            .build()
-        okHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                LogUtils.d("getSongUrlById onFailure")
+    /**
+     * feeStr:
+     * 0:免费或无版权
+     * 1:VIP 歌曲
+     * 4:购买专辑
+     * 8:非会员可免费播放低音质，会员可播放高音质及下载
+     * fee为1或8的歌曲均可单独购买 2元单曲
+     */
+    private fun initSongVipStatus(feeStr: String): SongVipStatus {
+        var vipStatus = SongVipStatus.FREE
+        when (feeStr) {
+            "0" -> {
+                vipStatus = SongVipStatus.FREE
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                val bodyStr = response.body?.string()
-                LogUtils.d("getSongUrlById onResponse body = $bodyStr")
-
-                val jsonObjectStr = JSONObject.parseObject(bodyStr)
-                val dataStr = jsonObjectStr["data"].toString()
-                val dataArray= JSONObject.parseArray(dataStr)
-                if(dataArray.size>0){
-                    val data = dataArray[0].toString()
-                    val dataObj = JSONObject.parseObject(data)
-                    val url = dataObj["url"].toString()
-                    LogUtils.d("getSongUrlById url = $url")
-
-
-                    MediaService.startPlay(context!!,url)
-
-
-                }else{
-                    LogUtils.d("getSongUrlById dataArray.size = 0")
-                }
+            "1" -> {
+                vipStatus = SongVipStatus.VIP
             }
 
-        })
+            "4" -> {
+                vipStatus = SongVipStatus.BUY_ALBUM
+            }
 
+            "8" -> {
+                vipStatus = SongVipStatus.ALL_CAN_PLAY
+            }
+        }
+        return vipStatus
     }
-
 
 
 }

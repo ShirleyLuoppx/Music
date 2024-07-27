@@ -1,5 +1,6 @@
 package com.ppx.music.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -32,5 +33,10 @@ abstract class BaseActivity<V : ViewDataBinding> : AppCompatActivity() {
         super.onDestroy()
 
         binding.unbind()
+    }
+
+    fun startActivity(clazz: Class<Any>){
+        val intent = Intent(this,clazz::class.java)
+        startActivity(intent)
     }
 }
