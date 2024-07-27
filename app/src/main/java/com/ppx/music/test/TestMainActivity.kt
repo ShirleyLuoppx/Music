@@ -17,7 +17,7 @@ class TestMainActivity: AppCompatActivity() {
         setContentView(R.layout.activity_test_main)
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.test_frame_layout,TestAFragment())
+            .replace(R.id.test_frame_layout,TestDrawerLayoutFragment())
             .commit()
     }
 }

@@ -2,6 +2,7 @@ package com.ppx.music.view
 
 import android.annotation.SuppressLint
 import android.widget.TextView
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentTransaction
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityMainBinding
@@ -26,6 +27,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         tvRecommend.setOnClickListener { selectFragment(0) }
         tvFind.setOnClickListener { selectFragment(1) }
         tvMine.setOnClickListener { selectFragment(2) }
+        binding.ivClickDrawerlayout.setOnClickListener {
+            binding.drawerlayout.openDrawer(GravityCompat.START, true)
+
+        }
     }
 
     override fun initData() {
