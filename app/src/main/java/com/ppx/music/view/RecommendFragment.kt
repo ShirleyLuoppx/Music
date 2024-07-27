@@ -5,7 +5,9 @@ import android.text.TextUtils.replace
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
+import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -30,7 +32,7 @@ import okhttp3.Response
  *
  * 包含 ：每日30首，推荐歌单，猜你喜欢，排行榜等列表
  */
-class RecommendFragment : Fragment() {
+class RecommendFragment : Fragment(), OnClickListener {
 
     private lateinit var binding: FragmentRecommendBinding
 
@@ -39,7 +41,7 @@ class RecommendFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_recommend, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_recommend, container, false)
         return binding.root
     }
 
@@ -55,15 +57,25 @@ class RecommendFragment : Fragment() {
     }
 
     private fun initListener() {
-        binding.cvDailyRecommend.setOnClickListener {
+        binding.cvDailyRecommend.setOnClickListener(this)
+    }
 
-            //转到DailyRecommendFragment
-            val dailyRecommendFragment = DailyRecommendFragment()
-            activity?.supportFragmentManager?.beginTransaction()
-                ?.replace(R.id.framelayout, dailyRecommendFragment)
-                ?.addToBackStack(null)
-                ?.commit()
+    override fun onClick(p0: View?) {
+        when (p0?.id) {
+            R.id.cv_daily_recommend -> {
+                clickDailyRecommend()
+                return
+            }
         }
+    }
+
+    private fun clickDailyRecommend() {
+        //转到DailyRecommendFragment
+        val dailyRecommendFragment = DailyRecommendFragment()
+        activity?.supportFragmentManager?.beginTransaction()
+            ?.replace(R.id.framelayout, dailyRecommendFragment)
+            ?.addToBackStack(null)
+            ?.commit()
     }
 
 

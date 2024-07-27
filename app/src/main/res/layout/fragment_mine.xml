@@ -1,91 +1,270 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/tv_userId"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="asdasda"
-        android:textColor="@color/black"/>
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_nickname"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_userId"
-        android:textColor="@color/black"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="@color/bg_mine"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/tv_gender"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_nickname"
-        android:textColor="@color/black"/>
+            <ImageView
+                android:id="@+id/iv_avatar_url"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="50dp"
+                android:src="@mipmap/ic_launcher_round"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- <ImageView
-         android:id="@+id/iv_avatar_url"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         app:layout_constraintLeft_toLeftOf="parent"
-         app:layout_constraintRight_toRightOf="parent"
-         app:layout_constraintTop_toBottomOf="@id/tv_gender" />-->
+            <TextView
+                android:id="@+id/tv_userId"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="asdasda"
+                android:textColor="@color/black"
+                android:visibility="gone"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_vip_type"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_gender"
-        android:textColor="@color/black"/>
+            <TextView
+                android:id="@+id/tv_nickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:hint="@string/test"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_avatar_url" />
 
-    <TextView
-        android:id="@+id/tv_signature"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_vip_type"
-        android:textColor="@color/black"/>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_vip_info"
+                android:layout_width="80dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@color/black"
+                app:cardCornerRadius="10dp"
+                app:layout_constraintLeft_toRightOf="@id/tv_nickname"
+                app:layout_constraintTop_toTopOf="@id/tv_nickname">
 
-    <TextView
-        android:id="@+id/tv_followeds"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_signature"
-        android:textColor="@color/black"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/vip"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/tv_follows"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_followeds"
-        android:textColor="@color/black"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:text="@string/renewal"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/tv_level"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_follows"
-        android:textColor="@color/black"/>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_vip"
+                android:layout_width="80dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@color/black"
+                android:visibility="gone"
+                app:cardCornerRadius="10dp"
+                app:layout_constraintLeft_toRightOf="@id/tv_nickname"
+                app:layout_constraintTop_toTopOf="@id/tv_nickname">
 
+                <TextView
+                    android:id="@+id/tv_hello_vip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:text="会员你好"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tv_signature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:hint="@string/test"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cv_vip_info" />
+
+            <!--地址、几零后、性别、星座、村龄等基本信息-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_user_base_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_signature">
+
+                <TextView
+                    android:id="@+id/tv_city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:hint="@string/test"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/tv_dot_one"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_dot_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="·"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/tv_city"
+                    app:layout_constraintTop_toTopOf="@id/tv_city" />
+
+                <ImageView
+                    android:id="@+id/iv_gender"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@mipmap/ic_male"
+                    app:layout_constraintLeft_toRightOf="@id/tv_dot_one"
+                    app:layout_constraintTop_toTopOf="@id/tv_city" />
+
+                <TextView
+                    android:id="@+id/tv_year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/test"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/iv_gender"
+                    app:layout_constraintTop_toTopOf="@id/tv_city" />
+
+                <TextView
+                    android:id="@+id/tv_constellation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/test"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/tv_year"
+                    app:layout_constraintTop_toTopOf="@id/tv_city" />
+
+                <TextView
+                    android:id="@+id/tv_dot_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="·"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/tv_constellation"
+                    app:layout_constraintTop_toTopOf="@id/tv_city" />
+
+                <TextView
+                    android:id="@+id/tv_app_user_years"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="@string/test"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/tv_dot_two"
+                    app:layout_constraintTop_toTopOf="@id/tv_city" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--关注数、粉丝数、等级、听歌时长等信息-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_follwers_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl_user_base_info">
+
+                <TextView
+                    android:id="@+id/tv_followeds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/test"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_follows"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="@string/test"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/tv_followeds"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="@string/test"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/tv_follows"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_listen_song_hours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:hint="@string/test"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    app:layout_constraintLeft_toRightOf="@id/tv_level"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_gender"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textColor="@color/black"
+                android:visibility="gone"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_nickname" />
+
+            <TextView
+                android:id="@+id/tv_vip_type"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textColor="@color/black"
+                android:visibility="gone"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_gender" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!--列表数据-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

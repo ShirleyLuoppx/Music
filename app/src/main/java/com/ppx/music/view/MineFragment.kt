@@ -1,7 +1,10 @@
 package com.ppx.music.view
 
+import android.net.Uri
+import android.view.View
 import android.widget.TextView
 import com.alibaba.fastjson.JSON
+import com.bumptech.glide.Glide
 import com.ppx.music.R
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.databinding.FragmentMineBinding
@@ -13,6 +16,11 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
+/**
+ * @Author Shirley
+ * @Date：2024/7/22
+ * @Desc：我的
+ */
 class MineFragment : BaseFragment<FragmentMineBinding>() {
 
     override fun initView() {
@@ -53,58 +61,69 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
                     val body = response.body!!.string()
                     LogUtils.d("getUserDetail onResponse: $body")
 
-                    val json = JSON.parseObject(body)
-
-                    val level = json["level"].toString()
-                    val tvLevel: TextView = binding.tvLevel
-                    tvLevel.text = level
-                    binding.tvLevel.text = level
-                    LogUtils.d("getUserDetailsInfo onSuccess level = $level")
-
-                    val profileObj = json.getJSONObject("profile")
-
-                    val gender = profileObj["gender"].toString()
-                    LogUtils.d("getUserDetailsInfo onSuccess gender = $gender")
-
-                    val tvUserId: TextView = binding.tvUserId
-                    tvUserId.text = profileObj["userId"].toString()
-                    LogUtils.d("getUserDetailsInfo onSuccess tvUserId = $tvUserId")
-
-                    val sex = if (gender == "1") {
-                        "男"
-                    } else {
-                        "女"
-                    }
-                    val tvGender: TextView = binding.tvGender
-                    tvGender.text = sex
-                    val nickname = profileObj["nickname"].toString()
-                    LogUtils.d("getUserDetailsInfo onSuccess nickname = $nickname")
-                    binding.tvNickname.text = nickname
-
-                    val avatarUrl = profileObj["avatarUrl"].toString()
-                    //                binding.ivAvatarUrl.setImageURI(Uri.parse(avatarUrl))
-
-                    val vipType = profileObj["vipType"].toString()
-                    val isVip = if (vipType == "0") {
-                        "请开通会员"
-                    } else {
-                        "尊贵的vip您好"
-                    }
-                    binding.tvVipType.text = isVip
-
-                    val signature = profileObj["signature"].toString()
-                    binding.tvSignature.text = signature
-
-                    val fans = profileObj["followeds"].toString()
-                    binding.tvFolloweds.text = fans
-
-                    val follows = profileObj["follows"].toString()
-                    binding.tvFollows.text = follows
+                    analysisUserInfo(body)
                 }
-
-
             }
         })
+    }
+
+    private fun analysisUserInfo(info: String) {
+        val json = JSON.parseObject(info)
+
+        //等级
+        val level = json["level"].toString()
+        binding.tvLevel.text = "Lv.${level}等级"
+        LogUtils.d("getUserDetailsInfo onSuccess level = $level")
+
+        val profileObj = json.getJSONObject("profile")
+
+        //头像
+        val avatarUrl = profileObj["avatarUrl"].toString()
+        Glide.with(requireActivity()).load(avatarUrl).into(binding.ivAvatarUrl)
+
+        //昵称
+        val nickname = profileObj["nickname"].toString()
+        LogUtils.d("getUserDetailsInfo onSuccess nickname = $nickname")
+        binding.tvNickname.text = nickname
+
+        //vip状态
+        val vipType = profileObj["vipType"].toString()
+        if (vipType == "0") {
+            binding.cvVipInfo.visibility = View.VISIBLE
+            binding.cvVip.visibility = View.GONE
+        } else {
+            binding.cvVipInfo.visibility = View.GONE
+            binding.cvVip.visibility = View.VISIBLE
+        }
+
+        val signature = profileObj["signature"].toString()
+        binding.tvSignature.text = signature
+
+        //TODO:城市
+
+        val gender = profileObj["gender"].toString()
+        LogUtils.d("getUserDetailsInfo onSuccess gender = $gender")
+        val genderPic = if (gender == "1") {
+            resources.getDrawable(R.mipmap.ic_famale)
+        } else {
+            resources.getDrawable(R.mipmap.ic_male)
+        }
+        binding.ivGender.setImageDrawable(genderPic)
+
+
+        //TODO:几零后
+        //TODO:星座
+        //TODO:村龄
+
+        val follows = profileObj["follows"].toString()
+        binding.tvFollows.text = "$follows 关注"
+
+        val fans = profileObj["followeds"].toString()
+        binding.tvFolloweds.text = "$fans 粉丝"
+
+
+
+        //TODO：听歌时长
 
 
     }

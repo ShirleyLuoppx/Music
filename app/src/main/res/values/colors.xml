@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="red">#FF0000</color>
+    <color name="gray">#46484C</color>
+    <color name="bg_drawerlayout">#F7F9FC</color>
+    <color name="bg_mine">#5B5B8E</color>
 </resources>
