@@ -46,5 +46,8 @@ class ApiConstants {
 
         //通过歌曲id获取歌曲的url
         const val GET_URL_BY_SONG_ID = "$HTTP_URL/song/url"
+
+        //通过id获取城市
+        const val GET_CITY_BY_ID = "$HTTP_URL/countries/code/list"
     }
 }

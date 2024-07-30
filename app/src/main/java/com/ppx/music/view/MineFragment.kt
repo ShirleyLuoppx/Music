@@ -1,14 +1,14 @@
 package com.ppx.music.view
 
-import android.net.Uri
 import android.view.View
-import android.widget.TextView
 import com.alibaba.fastjson.JSON
 import com.bumptech.glide.Glide
 import com.ppx.music.R
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.databinding.FragmentMineBinding
 import com.ppx.music.utils.LogUtils
+import com.ppx.music.utils.ProvincesUtils
+import com.ppx.music.viewmodel.UserDetailVM
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -23,6 +23,8 @@ import java.io.IOException
  */
 class MineFragment : BaseFragment<FragmentMineBinding>() {
 
+    private lateinit var viewmodel: UserDetailVM
+
     override fun initView() {
     }
 
@@ -30,6 +32,11 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
     }
 
     override fun initData() {
+
+//        viewmodel = ViewModelProvider(this)[UserDetailVM::class.java]
+//        binding.viewModel = viewmodel
+//        binding.lifecycleOwner = this
+
         val userId = 494817816
         getUserDetail(userId)
     }
@@ -75,6 +82,9 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
         binding.tvLevel.text = "Lv.${level}等级"
         LogUtils.d("getUserDetailsInfo onSuccess level = $level")
 
+        val listenSongs = json["listenSongs"].toString()
+        binding.tvListenSongHours.text = "${listenSongs}首"
+
         val profileObj = json.getJSONObject("profile")
 
         //头像
@@ -96,11 +106,17 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
             binding.cvVip.visibility = View.VISIBLE
         }
 
+        //个性签名
         val signature = profileObj["signature"].toString()
         binding.tvSignature.text = signature
 
-        //TODO:城市
+        //城市
+        val provinceId = profileObj["province"].toString().toInt()
+        val cityName = ProvincesUtils.getProvinceStrById(provinceId)
+        LogUtils.d("getUserDetailsInfo onSuccess cityName = $cityName")
+        binding.tvCity.text = cityName
 
+        //性别
         val gender = profileObj["gender"].toString()
         LogUtils.d("getUserDetailsInfo onSuccess gender = $gender")
         val genderPic = if (gender == "1") {
@@ -115,12 +131,13 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
         //TODO:星座
         //TODO:村龄
 
+        //关注
         val follows = profileObj["follows"].toString()
         binding.tvFollows.text = "$follows 关注"
 
+        //粉丝
         val fans = profileObj["followeds"].toString()
         binding.tvFolloweds.text = "$fans 粉丝"
-
 
 
         //TODO：听歌时长

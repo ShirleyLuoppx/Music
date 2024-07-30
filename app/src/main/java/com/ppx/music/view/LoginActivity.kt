@@ -35,6 +35,8 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(){
     private var netUtils = NetRequest()
 
     override fun initView() {
+
+
     }
 
     override fun initListener() {

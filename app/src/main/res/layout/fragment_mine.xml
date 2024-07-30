@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
+    <data>
+
+        <variable
+            name="userDetailVM"
+            type="com.ppx.music.viewmodel.UserDetailVM" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
@@ -51,24 +58,29 @@
                 android:layout_height="20dp"
                 android:layout_marginStart="10dp"
                 android:background="@color/black"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintLeft_toRightOf="@id/tv_nickname"
                 app:layout_constraintTop_toTopOf="@id/tv_nickname">
 
                 <TextView
+                    android:id="@+id/tv_vip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:text="@string/vip"
-                    android:textColor="@color/white"
+                    android:textColor="@color/gray"
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_renewal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15dp"
                     android:text="@string/renewal"
-                    android:textColor="@color/white"
+                    android:textColor="@color/gray"
                     android:textSize="17sp"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
@@ -79,7 +91,7 @@
                 android:layout_height="20dp"
                 android:layout_marginStart="10dp"
                 android:background="@color/black"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintLeft_toRightOf="@id/tv_nickname"
                 app:layout_constraintTop_toTopOf="@id/tv_nickname">
@@ -88,9 +100,9 @@
                     android:id="@+id/tv_hello_vip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
+                    android:layout_gravity="center"
                     android:text="会员你好"
-                    android:textColor="@color/white"
+                    android:textColor="@color/gray"
                     android:textSize="17sp"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
@@ -105,7 +117,7 @@
                 android:textSize="10sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/cv_vip_info" />
+                app:layout_constraintTop_toBottomOf="@id/tv_nickname" />
 
             <!--地址、几零后、性别、星座、村龄等基本信息-->
             <androidx.constraintlayout.widget.ConstraintLayout
