@@ -47,9 +47,9 @@
         <!--        唱片机图片-->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/spi_music_rotate"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="110dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_marginTop="150dp"
             android:scaleType="centerCrop"
             android:src="@mipmap/ic_launcher_round"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -63,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="80dp"
             android:hint="I'm So Sorry"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/spi_music_rotate" />
@@ -106,7 +106,9 @@
             android:progress="20"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_singer_name" />
+            app:layout_constraintTop_toBottomOf="@id/tv_singer_name"
+            style="?android:attr/progressBarStyleHorizontal"
+            />
 
         <TextView
             android:id="@+id/tv_curr_time"

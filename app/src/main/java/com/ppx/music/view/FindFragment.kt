@@ -21,4 +21,8 @@ class FindFragment : BaseFragment<FragmentFindBinding>(){
     override fun getLayoutId(): Int {
         return  R.layout.fragment_find
     }
+
+    override fun onDestroyFragment() {
+        TODO("Not yet implemented")
+    }
 }

@@ -83,7 +83,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>() {
                     LogUtils.d("getSongUrlById url = $url")
 
 
-                    MediaService.startPlay(this@PlayerActivity, url)
+//                    MediaService.startPlay(this@PlayerActivity, url)
                 } else {
                     LogUtils.d("getSongUrlById dataArray.size = 0")
                 }

@@ -66,6 +66,10 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
         return R.layout.fragment_daily_recommend
     }
 
+    override fun onDestroyFragment() {
+        TODO("Not yet implemented")
+    }
+
 
     private fun getDailyRecommendSongs() {
         val okHttpClient = OkHttpClient()

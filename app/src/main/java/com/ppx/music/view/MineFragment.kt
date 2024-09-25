@@ -1,11 +1,13 @@
 package com.ppx.music.view
 
+import android.text.TextUtils
 import android.view.View
 import com.alibaba.fastjson.JSON
 import com.bumptech.glide.Glide
 import com.ppx.music.R
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.databinding.FragmentMineBinding
+import com.ppx.music.model.MessageEvent
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.ProvincesUtils
 import com.ppx.music.viewmodel.UserDetailVM
@@ -14,6 +16,9 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.io.IOException
 
 /**
@@ -32,7 +37,7 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
     }
 
     override fun initData() {
-
+        EventBus.getDefault().register(this)
 //        viewmodel = ViewModelProvider(this)[UserDetailVM::class.java]
 //        binding.viewModel = viewmodel
 //        binding.lifecycleOwner = this
@@ -43,6 +48,10 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_mine
+    }
+
+    override fun onDestroyFragment() {
+        EventBus.getDefault().unregister(this)
     }
 
     /**
@@ -64,14 +73,19 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
             override fun onResponse(call: Call, response: Response) {
                 LogUtils.d("getUserDetailsInfo onResponse")
 
-                requireActivity().runOnUiThread {
-                    val body = response.body!!.string()
-                    LogUtils.d("getUserDetail onResponse: $body")
-
-                    analysisUserInfo(body)
-                }
+                val body = response.body!!.string()
+                //暂时先这样用eventbus把数据传出去更新，后续改成mvvm
+                EventBus.getDefault().post(MessageEvent(body))
             }
         })
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEvent(event:MessageEvent ){
+        LogUtils.d("bodyString = ${event.body}")
+        if(!TextUtils.isEmpty(event.body)){
+            analysisUserInfo(event.body!!)
+        }
     }
 
     private fun analysisUserInfo(info: String) {
@@ -144,5 +158,6 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
 
 
     }
+
 
 }

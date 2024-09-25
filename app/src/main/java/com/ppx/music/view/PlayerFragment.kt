@@ -16,4 +16,8 @@ class PlayerFragment : BaseFragment<FragmentPlayerBinding>() {
     override fun getLayoutId(): Int {
         return R.layout.fragment_player
     }
+
+    override fun onDestroyFragment() {
+        TODO("Not yet implemented")
+    }
 }
