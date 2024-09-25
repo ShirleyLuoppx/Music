@@ -3,16 +3,19 @@ package com.ppx.music.player
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.IBinder
+import com.ppx.music.MusicApplication
 import com.ppx.music.utils.LogUtils
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import tv.danmaku.ijk.media.player.IMediaPlayer.OnErrorListener
 import tv.danmaku.ijk.media.player.IMediaPlayer.OnPreparedListener
+import tv.danmaku.ijk.media.player.IjkMediaPlayer
 
 class MediaService : Service() ,OnErrorListener,OnPreparedListener {
 
     //ijkplayer
-    private lateinit var ijkAudioPlayer: IjkPlayer
+    private var ijkAudioPlayer  = IjkMediaPlayer()
     private val TAG = "MediaService"
 
 
@@ -22,7 +25,7 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
 
         fun startPlay(context: Context, uri: String) {
             context.startService(
-                Intent(context, MediaService::class.java).putExtra(PLAY_URI, uri).setAction(PLAY)
+                Intent(context, MediaService::class.java).putExtra(PLAY_URI, uri)   //.setAction(PLAY)
             )
         }
 
@@ -52,23 +55,30 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
         super.onCreate()
 
 
-        LogUtils.d("$TAG   onCreate")
-//        if (ijkAudioPlayer == null) {
+        /*if (ijkAudioPlayer == null) {
             ijkAudioPlayer = IjkPlayer()
-            ijkAudioPlayer.init()
-            ijkAudioPlayer.getPlayer()?.setOnErrorListener(this)
-            ijkAudioPlayer.getPlayer()?.setOnPreparedListener(this)
-//        }
+            ijkAudioPlayer?.init()
+            ijkAudioPlayer?.getPlayer()?.setOnErrorListener(this)
+            ijkAudioPlayer?.getPlayer()?.setOnPreparedListener(this)
+        }*/
 
+        LogUtils.d("$TAG   onCreate service ====================================== ijkAudioPlayer = $ijkAudioPlayer")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        LogUtils.d("$TAG onStartCommand")
+        LogUtils.d("$TAG onStartCommand ====================================== ")
         val uri = intent?.getStringExtra(PLAY_URI)
         LogUtils.d("$TAG onStartCommand uri = $uri")
-        ijkAudioPlayer.setPathAndPrepare(uri)
+//                    ijkAudioPlayer.stop()
+        LogUtils.d("111111111111111111111111111111111111111111 $ijkAudioPlayer")
+        ijkAudioPlayer.setDataSource(MusicApplication.context, Uri.parse(uri))
+        LogUtils.d("22222222222222222222222222222222222222222 $ijkAudioPlayer")
+        ijkAudioPlayer.prepareAsync()
+        LogUtils.d("333333333333333333333333333333333333333333 $ijkAudioPlayer")
         ijkAudioPlayer.start()
+        LogUtils.d("44444444444444444444444444444444444444444444 $ijkAudioPlayer")
+
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -79,7 +89,7 @@ class MediaService : Service() ,OnErrorListener,OnPreparedListener {
     }
 
     override fun onPrepared(p0: IMediaPlayer?) {
-        LogUtils.d("onPrepared ")
+        LogUtils.d("onPrepared ======================================")
     }
 
 }

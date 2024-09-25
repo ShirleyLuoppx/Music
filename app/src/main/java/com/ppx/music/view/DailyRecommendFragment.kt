@@ -37,7 +37,8 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
         dailyRecommendAdapter.setOnItemClickListener { adapter, view, position ->
             val clickSongDetailInfo = adapter.getItem(position)
             val clickSongId = clickSongDetailInfo?.songId
-            LogUtils.d("onItemClick $position and clickSongId = $clickSongId")
+            val clickSongName = clickSongDetailInfo?.songName
+            LogUtils.d("onItemClick $position and clickSongId = $clickSongId and clickSongName = $clickSongName")
 
             //跳转到播放页面
 //            val transaction = activity?.supportFragmentManager?.beginTransaction()
@@ -67,7 +68,6 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
     }
 
     override fun onDestroyFragment() {
-        TODO("Not yet implemented")
     }
 
 

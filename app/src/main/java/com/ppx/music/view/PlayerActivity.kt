@@ -1,14 +1,21 @@
 package com.ppx.music.view
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import com.alibaba.fastjson.JSONObject
 import com.bumptech.glide.Glide
+import com.ppx.music.MusicApplication
 import com.ppx.music.R
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.databinding.FragmentPlayerBinding
 import com.ppx.music.model.SongDetailInfo
+import com.ppx.music.player.DBMusicPlayer
 import com.ppx.music.player.MediaService
+import com.ppx.music.player.MediaService.Companion.PLAY_URI
+import com.ppx.music.player.MusicPlayerService
+import com.ppx.music.player.MusicService
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.TimeTransUtils
 import okhttp3.Call
@@ -17,6 +24,7 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import java.io.IOException
 import kotlin.text.StringBuilder
 
@@ -56,6 +64,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>() {
     }
 
     private fun getSongUrlById(id: String) {
+
         val requestBody = FormBody.Builder()
             .add("id", id)
             .build()
@@ -83,7 +92,38 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>() {
                     LogUtils.d("getSongUrlById url = $url")
 
 
-//                    MediaService.startPlay(this@PlayerActivity, url)
+//                    MusicService.startPlay(MusicApplication.context, url)
+
+//在service里面去播放就会容易崩溃
+                    val intent = Intent(MusicApplication.context, DBMusicPlayer::class.java)
+                    intent.putExtra("url", url)
+                    intent.setAction("PLAY")
+                    startService(intent)
+
+                    //在service里面去播放就会容易崩溃
+//                    val intent = Intent(MusicApplication.context, MusicService::class.java)
+//                    intent.putExtra("PLAY_URI", url) //.setAction(PLAY)
+//                    startService(intent)
+
+                    //使用豆包提供的原生的mediaPlayer也可以正常播放...
+//                    val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
+//                    intent.putExtra("url", url)
+//                    intent.setAction("PLAY")
+//                    startService(intent)
+
+                    //直接用这种的就基本能播放
+//                    val player = IjkMediaPlayer()
+//                    player.setDataSource(MusicApplication.context, Uri.parse(url))
+//                    player.prepareAsync()
+//                    player.start()
+
+                    /**
+                     * Crashes：
+                     * Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x430a0000 in tid 4915 (ff_read), pid 4787 (com.ppx.music)
+                     * Fatal signal 7 (SIGBUS), code 1 (BUS_ADRALN), fault addr 0x73736500000001 in tid 10718 (ff_read), pid 10627 (com.ppx.music)
+                     * Using Network Security Config from resource network_security_config debugBuild: true
+                     */
+
                 } else {
                     LogUtils.d("getSongUrlById dataArray.size = 0")
                 }
