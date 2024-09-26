@@ -7,13 +7,17 @@ import com.alibaba.fastjson.JSON
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.common.Constants
 import com.ppx.music.common.SPKey
+import com.ppx.music.model.PlaySongUrlEvent
 import com.ppx.music.model.ResponseInfo
+import com.ppx.music.player.MusicController
+import com.ppx.music.player.MusicPlayerService
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.SPUtils
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.create
 import okio.IOException
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 
 /**
@@ -25,13 +29,45 @@ import org.json.JSONObject
 class NetRequest {
 
     companion object {
-        private lateinit var netUtils: NetRequest
-        fun getInstance(): NetRequest {
-            if (netUtils == null) {
-                netUtils = NetRequest()
-            }
-            return netUtils
+        val instance: NetRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+            NetRequest()
         }
+    }
+
+    fun getSongUrlById(id: String)  {
+        val requestBody = FormBody.Builder()
+            .add("id", id)
+            .build()
+        val okHttpClient = OkHttpClient()
+        val request = Request.Builder()
+            .url(ApiConstants.GET_URL_BY_SONG_ID)
+            .post(requestBody)
+            .build()
+        okHttpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                LogUtils.d("getSongUrlById onFailure")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string()
+                LogUtils.d("getSongUrlById onResponse body = $bodyStr")
+
+                val jsonObjectStr = com.alibaba.fastjson.JSONObject.parseObject(bodyStr)
+                val dataStr = jsonObjectStr["data"].toString()
+                val dataArray = com.alibaba.fastjson.JSONObject.parseArray(dataStr)
+                if (dataArray.size > 0) {
+                    val data = dataArray[0].toString()
+                    val dataObj = com.alibaba.fastjson.JSONObject.parseObject(data)
+                    val url = dataObj["url"].toString()
+                    LogUtils.d(" NetRequest getSongUrlById url = $url")
+
+                    EventBus.getDefault().post(PlaySongUrlEvent(url))
+
+                } else {
+                    LogUtils.d("getSongUrlById dataArray.size = 0")
+                }
+            }
+        })
     }
 
     /**

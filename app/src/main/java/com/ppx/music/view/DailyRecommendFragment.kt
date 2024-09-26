@@ -10,6 +10,7 @@ import com.ppx.music.common.Constants
 import com.ppx.music.databinding.FragmentDailyRecommendBinding
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
+import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import okhttp3.Call
 import okhttp3.Callback
@@ -35,6 +36,9 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
     override fun initListener() {
 
         dailyRecommendAdapter.setOnItemClickListener { adapter, view, position ->
+
+            MusicController.instance.setCurrentSongIndex(position)
+
             val clickSongDetailInfo = adapter.getItem(position)
             val clickSongId = clickSongDetailInfo?.songId
             val clickSongName = clickSongDetailInfo?.songName
@@ -46,21 +50,13 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 //            transaction?.commit()
 
             val intent = Intent(requireActivity(), PlayerActivity::class.java)
-//            val clickSongDetailInfo = songsInfoList[position]
             intent.putExtra("clickSongDetailInfo",clickSongDetailInfo)
-//            intent.putExtra("clickSongId", clickSongDetailInfo)
             startActivity(intent)
-
-            /*if (clickSongId != null) {
-                getSongUrlById(clickSongId)
-            }*/
-
         }
     }
 
     override fun initData() {
         getDailyRecommendSongs()
-
     }
 
     override fun getLayoutId(): Int {
@@ -160,9 +156,9 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
 //                dailyRecommendAdapter.notifyDataSetChanged()
             }
-        }
-//        initRv()
 
+            MusicController.instance.setMusicDataList(songsInfoList)
+        }
         return songsInfoList
     }
 

@@ -2,47 +2,57 @@ package com.ppx.music.view
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
-import com.alibaba.fastjson.JSONObject
+import android.text.TextUtils
+import android.view.View
+import android.view.View.OnClickListener
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import com.bumptech.glide.Glide
 import com.ppx.music.MusicApplication
+import com.ppx.music.NetRequest
 import com.ppx.music.R
-import com.ppx.music.common.ApiConstants
 import com.ppx.music.databinding.FragmentPlayerBinding
+import com.ppx.music.model.PlaySongUrlEvent
 import com.ppx.music.model.SongDetailInfo
-import com.ppx.music.player.DBMusicPlayer
-import com.ppx.music.player.MediaService
-import com.ppx.music.player.MediaService.Companion.PLAY_URI
+import com.ppx.music.player.MusicController
 import com.ppx.music.player.MusicPlayerService
-import com.ppx.music.player.MusicService
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.TimeTransUtils
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import tv.danmaku.ijk.media.player.IjkMediaPlayer
-import java.io.IOException
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import kotlin.text.StringBuilder
 
-class PlayerActivity : BaseActivity<FragmentPlayerBinding>() {
+class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
 
     private var clickSongDetailInfo: SongDetailInfo? = SongDetailInfo()
+    private val musicController = MusicController.instance
+    private lateinit var animationSongBg: Animation
+    private lateinit var animationStylus: Animation
 
     override fun initView() {
+        animationSongBg = AnimationUtils.loadAnimation(this, R.anim.anim_rotate_songbg)
+        animationSongBg.interpolator = LinearInterpolator()
+        binding.spiMusicRotate.startAnimation(animationSongBg)
 
+        animationStylus = AnimationUtils.loadAnimation(this, R.anim.anim_rotate_stylus)
+        animationStylus.interpolator = LinearInterpolator()
+        binding.ivStylus.startAnimation(animationStylus)
     }
 
     override fun initListener() {
+        binding.ivLoopMode.setOnClickListener(this)
+        binding.ivPreSong.setOnClickListener(this)
+        binding.ivPlaySong.setOnClickListener(this)
+        binding.ivNextSong.setOnClickListener(this)
+        binding.ivPlayingSongList.setOnClickListener(this)
+
     }
 
     @SuppressLint("NewApi")
     override fun initData() {
-//        val clickSongId = intent.getStringExtra("clickSongId")
-//        LogUtils.d("initData clickSongId = $clickSongId")
+        EventBus.getDefault().register(this)
 
         clickSongDetailInfo =
             intent.getParcelableExtra("clickSongDetailInfo")
@@ -56,79 +66,58 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>() {
 
             initPlayerData(clickSongDetailInfo!!)
         }
-
     }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_player
     }
 
-    private fun getSongUrlById(id: String) {
+    override fun destroyView() {
+        EventBus.getDefault().unregister(this)
+    }
 
-        val requestBody = FormBody.Builder()
-            .add("id", id)
-            .build()
-        val okHttpClient = OkHttpClient()
-        val request = Request.Builder()
-            .url(ApiConstants.GET_URL_BY_SONG_ID)
-            .post(requestBody)
-            .build()
-        okHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                LogUtils.d("getSongUrlById onFailure")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val bodyStr = response.body?.string()
-                LogUtils.d("getSongUrlById onResponse body = $bodyStr")
-
-                val jsonObjectStr = JSONObject.parseObject(bodyStr)
-                val dataStr = jsonObjectStr["data"].toString()
-                val dataArray = JSONObject.parseArray(dataStr)
-                if (dataArray.size > 0) {
-                    val data = dataArray[0].toString()
-                    val dataObj = JSONObject.parseObject(data)
-                    val url = dataObj["url"].toString()
-                    LogUtils.d("getSongUrlById url = $url")
-
-                    //在service里面去播放就会容易崩溃
-//                    val intent = Intent(MusicApplication.context, MusicService::class.java)
-//                    intent.putExtra("PLAY_URI", url) //.setAction(PLAY)
-//                    startService(intent)
-
-                    //使用豆包提供的原生的mediaPlayer也可以正常播放...
-                    val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
-                    intent.putExtra("url", url)
-                    intent.setAction("PLAY")
-                    startService(intent)
-
-                    //直接用这种的就基本能播放
-//                    val player = IjkMediaPlayer()
-//                    player.setDataSource(MusicApplication.context, Uri.parse(url))
-//                    player.prepareAsync()
-//                    player.start()
-
-                    /**
-                     * Crashes：
-                     * Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x430a0000 in tid 4915 (ff_read), pid 4787 (com.ppx.music)
-                     * Fatal signal 7 (SIGBUS), code 1 (BUS_ADRALN), fault addr 0x73736500000001 in tid 10718 (ff_read), pid 10627 (com.ppx.music)
-                     * Using Network Security Config from resource network_security_config debugBuild: true
-                     */
-
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.iv_play_song -> {
+                LogUtils.d("onclick iv_play_song . playingStatus = ${musicController.isPlaying()}")
+                if (musicController.isPlaying()) {
+                    musicController.pauseMusic()
+                    binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
+                    binding.spiMusicRotate.clearAnimation()
                 } else {
-                    LogUtils.d("getSongUrlById dataArray.size = 0")
+                    musicController.resumeMusic()
+                    binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
+                    binding.spiMusicRotate.startAnimation(animationSongBg)
                 }
             }
 
-        })
+            R.id.iv_loop_mode -> {
+                LogUtils.d("onclick iv_loop_mode}")
+            }
 
+            R.id.iv_pre_song -> {
+                LogUtils.d("onclick iv_pre_song}")
+            }
+
+            R.id.iv_next_song -> {
+                LogUtils.d("onclick iv_next_song}")
+            }
+
+            R.id.iv_playing_song_list -> {
+                LogUtils.d("onclick iv_playing_song_list}")
+            }
+        }
+    }
+
+    private fun getSongUrlById(id: String) {
+        LogUtils.d("PlayerActivity getSongUrlById id = $id")
+        NetRequest.instance.getSongUrlById(id)
     }
 
     private fun initPlayerData(songData: SongDetailInfo) {
-//        binding.cvMusicRotateImg.background =
         Glide.with(this).load(songData.picUrl).into(binding.spiMusicRotate)
-        binding.tvSongName.text = songData.songName
 
+        binding.tvSongName.text = songData.songName
 
         val singerSb = StringBuilder()
         songData.songArtists.forEach {
@@ -137,9 +126,26 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>() {
         }
         binding.tvSingerName.text = singerSb.dropLast(1)
 
-
         val timeStr = TimeTransUtils.long2Minutes(songData.songTime)
         binding.tvTotalTime.text = timeStr
-
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onPlaySongUrlEvent(event: PlaySongUrlEvent) {
+        LogUtils.d("onPlaySongUrlEvent url = ${event.url}")
+        if (!TextUtils.isEmpty(event.url)) {
+            //使用豆包提供的原生的mediaPlayer也可以正常播放...
+            val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
+            intent.putExtra("url", event.url)
+            intent.setAction("PLAY")
+            startService(intent)
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onSongDetailInfo(songDetailInfo: SongDetailInfo) {
+        initPlayerData(songDetailInfo)
+    }
+
+
 }

@@ -43,6 +43,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         return R.layout.activity_main
     }
 
+    override fun destroyView() {
+
+    }
+
     private fun initFragment() {
         recommendFragment = RecommendFragment()
         findFragment = FindFragment()

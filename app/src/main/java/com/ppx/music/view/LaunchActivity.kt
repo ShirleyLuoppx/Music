@@ -43,4 +43,8 @@ class LaunchActivity :BaseActivity<ActivityLaunchBinding>() {
         return R.layout.activity_launch
     }
 
+    override fun destroyView() {
+
+    }
+
 }

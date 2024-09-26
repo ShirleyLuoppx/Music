@@ -13,6 +13,7 @@ abstract class BaseActivity<V : ViewDataBinding> : AppCompatActivity() {
     abstract fun initListener()
     abstract fun initData()
     abstract fun getLayoutId(): Int
+    abstract fun destroyView()
 
     public lateinit var binding: V
 
@@ -33,6 +34,7 @@ abstract class BaseActivity<V : ViewDataBinding> : AppCompatActivity() {
         super.onDestroy()
 
         binding.unbind()
+        destroyView()
     }
 
     fun startActivity(clazz: Class<Any>){

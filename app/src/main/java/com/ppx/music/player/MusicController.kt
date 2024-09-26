@@ -1,12 +1,18 @@
 package com.ppx.music.player
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
-import android.util.Log
-import com.google.android.exoplayer.C
+import android.text.TextUtils
+import com.ppx.music.MusicApplication
+import com.ppx.music.NetRequest
+import com.ppx.music.model.PlaySongUrlEvent
+import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.utils.LogUtils
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.io.IOException
 
 /**
@@ -16,10 +22,15 @@ import java.io.IOException
  * @Desc：音乐控制器
  */
 @SuppressLint("NotConstructor")
-class MusicController() : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
+class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
     MediaPlayer.OnCompletionListener {
 
     private var mediaPlayer: MediaPlayer? = null
+    private var musicDataList: ArrayList<SongDetailInfo> = ArrayList()
+
+    //当前播放的歌曲索引
+    private var currentSongIndex = -1
+    private var currentSongUrl = ""
 
     companion object {
         val instance: MusicController by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -45,9 +56,13 @@ class MusicController() : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorLis
 
     fun playMusic(url: String) {
         try {
-            mediaPlayer?.reset()
-            mediaPlayer?.setDataSource(url)
-            mediaPlayer?.prepareAsync()
+            if (!TextUtils.isEmpty(url)) {
+                mediaPlayer?.reset()
+                mediaPlayer?.setDataSource(url)
+                mediaPlayer?.prepareAsync()
+            } else {
+                LogUtils.e("playMusic : url is empty !!!")
+            }
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -60,9 +75,7 @@ class MusicController() : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorLis
     }
 
     fun resumeMusic() {
-        if (mediaPlayer?.isPlaying == true) {
-            mediaPlayer?.start()
-        }
+        mediaPlayer?.start()
     }
 
     fun stopMusic() {
@@ -70,6 +83,10 @@ class MusicController() : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorLis
             mediaPlayer?.stop()
             mediaPlayer?.reset()
         }
+    }
+
+    fun isPlaying(): Boolean {
+        return mediaPlayer?.isPlaying == true
     }
 
     override fun onPrepared(p0: MediaPlayer?) {
@@ -85,6 +102,35 @@ class MusicController() : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorLis
     override fun onCompletion(p0: MediaPlayer?) {
         LogUtils.d("onCompletion current song has finished ....")
 
+        LogUtils.d("onCompletion current song index is = $currentSongIndex and size is = ${musicDataList.size}")
+
+        if (currentSongIndex < musicDataList.size - 1) {
+            currentSongIndex++
+            val songDetailInfo = musicDataList[currentSongIndex]
+            val songId = songDetailInfo.songId
+
+            NetRequest.instance.getSongUrlById(songId)
+            EventBus.getDefault().post(songDetailInfo)
+
+        } else {
+            currentSongIndex = 0
+        }
+    }
+
+    fun setMusicDataList(musicDataList: ArrayList<SongDetailInfo>) {
+        this.musicDataList = musicDataList
+    }
+
+    fun getMusicDataList(): ArrayList<SongDetailInfo> {
+        return musicDataList
+    }
+
+    fun setCurrentSongIndex(index: Int) {
+        currentSongIndex = index
+    }
+
+    fun getCurrentSongIndex(): Int {
+        return currentSongIndex
     }
 
 }

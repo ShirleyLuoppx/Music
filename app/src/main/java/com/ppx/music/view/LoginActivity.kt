@@ -68,6 +68,10 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(){
         return R.layout.activity_login
     }
 
+    override fun destroyView() {
+
+    }
+
     private fun logout() {
         netUtils.logout()
     }
