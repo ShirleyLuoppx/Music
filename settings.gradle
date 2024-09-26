@@ -30,10 +30,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Music"
 include ':app'
-//implementation project(':ijkplayer-java')
-//include ':ijkplayer-java'
-//include ':ijkplayer-armv5'
-//include ':ijkplayer-armv7a'
-//include ':ijkplayer-arm64'
-//include ':ijkplayer-x86'
-//include ':ijkplayer-x86_64'
