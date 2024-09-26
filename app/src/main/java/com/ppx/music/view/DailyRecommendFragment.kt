@@ -123,11 +123,11 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
                 val jsonObject = JSONObject.parseObject(dailySongData)
                 //歌名
                 val songName = jsonObject["name"].toString()
-                LogUtils.d("onResponse : songName = $songName")
+//                LogUtils.d("onResponse : songName = $songName")
 
                 //歌曲id
                 val songId = jsonObject["id"].toString()
-                LogUtils.d("onResponse : songId = $songId")
+//                LogUtils.d("onResponse : songId = $songId")
 
                 //歌手名
                 val ar = jsonObject["ar"].toString()

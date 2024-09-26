@@ -20,10 +20,6 @@ import com.ppx.music.utils.LogUtils
  */
 class DailyRecommendAdapter : BaseQuickAdapter<SongDetailInfo, QuickViewHolder>() {
     override fun onBindViewHolder(holder: QuickViewHolder, position: Int, item: SongDetailInfo?) {
-
-        LogUtils.d("====================")
-
-
         // 设置item数据
         val tvSongName : TextView = holder.getView(R.id.tv_song_name)
         val tvSingerName : TextView = holder.getView(R.id.tv_singer_name)

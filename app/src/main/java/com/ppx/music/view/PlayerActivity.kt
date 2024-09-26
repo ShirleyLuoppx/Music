@@ -91,25 +91,16 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>() {
                     val url = dataObj["url"].toString()
                     LogUtils.d("getSongUrlById url = $url")
 
-
-//                    MusicService.startPlay(MusicApplication.context, url)
-
-//在service里面去播放就会容易崩溃
-                    val intent = Intent(MusicApplication.context, DBMusicPlayer::class.java)
-                    intent.putExtra("url", url)
-                    intent.setAction("PLAY")
-                    startService(intent)
-
                     //在service里面去播放就会容易崩溃
 //                    val intent = Intent(MusicApplication.context, MusicService::class.java)
 //                    intent.putExtra("PLAY_URI", url) //.setAction(PLAY)
 //                    startService(intent)
 
                     //使用豆包提供的原生的mediaPlayer也可以正常播放...
-//                    val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
-//                    intent.putExtra("url", url)
-//                    intent.setAction("PLAY")
-//                    startService(intent)
+                    val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
+                    intent.putExtra("url", url)
+                    intent.setAction("PLAY")
+                    startService(intent)
 
                     //直接用这种的就基本能播放
 //                    val player = IjkMediaPlayer()

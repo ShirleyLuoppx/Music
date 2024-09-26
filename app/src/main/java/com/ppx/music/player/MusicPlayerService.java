@@ -8,39 +8,39 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.ppx.music.utils.LogUtils;
+
 import java.io.IOException;
 
-public class MusicPlayerService extends Service implements MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
+/**
+ * 豆包生成的 MediaPlayer的 服务类
+ */
+public class MusicPlayerService extends Service  {
 
     private static final String TAG = "MusicPlayerService";
-    private MediaPlayer mediaPlayer;
     private IBinder binder = new MusicPlayerBinder();
+    private MusicController musicController;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnErrorListener(this);
-        mediaPlayer.setOnCompletionListener(this);
+        musicController = new MusicController();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent!= null && intent.getAction()!= null) {
+        if (intent != null && intent.getAction() != null) {
             if (intent.getAction().equals("PLAY")) {
                 String url = intent.getStringExtra("url");
-                if (url!= null) {
-                    playMusic(url);
+                if (url != null) {
+                    musicController.playMusic(url);
                 }
             } else if (intent.getAction().equals("PAUSE")) {
-                pauseMusic();
+                musicController.pauseMusic();
             } else if (intent.getAction().equals("RESUME")) {
-                resumeMusic();
+                musicController.resumeMusic();
             } else if (intent.getAction().equals("STOP")) {
-                stopMusic();
+                musicController.stopMusic();
             }
         }
         return START_STICKY;
@@ -54,52 +54,8 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopMusic();
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        mp.start();
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.e(TAG, "Error occurred while playing music: what = " + what + ", extra = " + extra);
-        return false;
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        // 音乐播放完成时的处理逻辑
-    }
-
-    private void playMusic(String url) {
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(url);
-            mediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void pauseMusic() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-        }
-    }
-
-    private void resumeMusic() {
-        if (!mediaPlayer.isPlaying()) {
-            mediaPlayer.start();
-        }
-    }
-
-    private void stopMusic() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-        }
+        Log.d(TAG, "onDestroy() service is destroyed and player is stopped!!!");
+        musicController.stopMusic();
     }
 
     public class MusicPlayerBinder extends Binder {
