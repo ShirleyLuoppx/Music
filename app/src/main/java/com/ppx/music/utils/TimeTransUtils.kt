@@ -10,17 +10,29 @@ object TimeTransUtils {
     /**
      * long类型的时间转换为分钟数
      *
-     * time = 206586
+     * time = 206586 毫秒
      *
      *
      *
      */
     fun long2Minutes(time: Long): String {
-        var minuteStr = ""
         val minutes: Int = (time / 1000 / 60).toInt()
         val seconds = time / 1000 % 60
-        minuteStr = "$minutes : $seconds"
-        LogUtils.d("$TAG long2Minutes minutes = $minuteStr")
-        return minuteStr
+
+        val minuteStr = if(minutes<10){
+            "0$minutes"
+        }else{
+            "$minutes"
+        }
+
+        val secondStr = if(seconds<10){
+            "0$seconds"
+        }else{
+            "$seconds"
+        }
+
+        val timeStr = "$minuteStr:$secondStr"
+        LogUtils.d("$TAG long2Minutes minutes = $timeStr")
+        return timeStr
     }
 }

@@ -89,6 +89,11 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         return mediaPlayer?.isPlaying == true
     }
 
+    //progress 毫秒
+    fun seekTo(progress: Int) {
+        mediaPlayer?.seekTo(progress)
+    }
+
     override fun onPrepared(p0: MediaPlayer?) {
         LogUtils.d("onPrepared current song has prepared and ready to start playing!!!")
         p0?.start()

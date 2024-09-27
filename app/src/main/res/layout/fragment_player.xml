@@ -51,8 +51,8 @@
             android:id="@+id/iv_stylus"
             android:layout_width="180dp"
             android:layout_height="80dp"
-            android:layout_marginTop="30dp"
             android:layout_marginStart="50dp"
+            android:layout_marginTop="30dp"
             android:src="@mipmap/ic_stylus_small"
             app:layout_constraintLeft_toLeftOf="@id/spi_music_rotate"
             app:layout_constraintRight_toRightOf="parent"
@@ -105,10 +105,20 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="35dp"
             android:layout_marginEnd="20dp"
-            android:progress="20"
+            android:max="100"
+            android:progress="0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_singer_name" />
+            app:layout_constraintTop_toBottomOf="@id/tv_singer_name"
+            android:visibility="invisible"/>
+
+        <SeekBar
+            android:id="@+id/sb_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-7dp"
+            app:layout_constraintLeft_toLeftOf="@id/pb_progress_bar"
+            app:layout_constraintTop_toTopOf="@id/pb_progress_bar" />
 
         <TextView
             android:id="@+id/tv_curr_time"

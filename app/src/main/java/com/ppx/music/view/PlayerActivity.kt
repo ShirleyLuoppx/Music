@@ -4,12 +4,15 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Handler
 import android.text.TextUtils
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import com.bumptech.glide.Glide
 import com.ppx.music.MusicApplication
 import com.ppx.music.NetRequest
@@ -25,8 +28,11 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-
-class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
+/**
+ * 播放页
+ */
+class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
+    OnSeekBarChangeListener {
 
     private var clickSongDetailInfo: SongDetailInfo? = SongDetailInfo()
     private val musicController = MusicController.instance
@@ -34,12 +40,17 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
     private lateinit var rotateAnimator: ObjectAnimator
     private val recordSet = AnimatorSet()
 
+    //当前播放歌曲的毫秒数
+    private var currSongMillsTime = 0
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
+
     override fun initView() {
         // 创建从0度到360度的旋转动画，耗时3秒
         rotateAnimator = ObjectAnimator.ofFloat(binding.spiMusicRotate, "rotation", 0f, 360f)
         rotateAnimator.repeatCount = ObjectAnimator.INFINITE // 无限循环播放
         rotateAnimator.interpolator = LinearInterpolator() // 匀速旋转
-        rotateAnimator.setDuration(20*1000)
+        rotateAnimator.setDuration(20 * 1000)
         // 创建AnimatorSet来管理rotateAnimator
         recordSet.play(rotateAnimator)
         recordSet.start()
@@ -47,6 +58,16 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
         stylusAnim(1)
         binding.ivStylus.animation = stylusRotate
         binding.ivStylus.startAnimation(stylusRotate)
+
+        handler = Handler()
+        runnable = Runnable {
+            LogUtils.d("currSongMillsTime = $currSongMillsTime")
+            currSongMillsTime += 1000
+            binding.sbSeekbar.progress = currSongMillsTime / 1000
+            binding.tvCurrTime.text = TimeTransUtils.long2Minutes(currSongMillsTime.toLong())
+            handler.postDelayed(runnable, 1000)
+        }
+        handler.postDelayed(runnable, 1000)
     }
 
     override fun initListener() {
@@ -55,6 +76,8 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
         binding.ivPlaySong.setOnClickListener(this)
         binding.ivNextSong.setOnClickListener(this)
         binding.ivPlayingSongList.setOnClickListener(this)
+        binding.ivDownWhite.setOnClickListener(this)
+        binding.sbSeekbar.setOnSeekBarChangeListener(this)
 
     }
 
@@ -93,11 +116,13 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
                     binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
                     recordSet.pause()
                     stylusAnim(0)
+                    handler.removeCallbacks(runnable)
                 } else {
                     musicController.resumeMusic()
                     binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
                     recordSet.resume()
                     stylusAnim(1)
+                    handler.post(runnable)
                 }
                 binding.ivStylus.startAnimation(stylusRotate)
             }
@@ -137,6 +162,8 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
         }
         binding.tvSingerName.text = singerSb.dropLast(1)
 
+        binding.sbSeekbar.max = (songData.songTime / 1000).toInt() //歌曲有多少秒 max就是多少  方便计算
+        LogUtils.d("seekbar max = ${songData.songTime / 1000}")
         val timeStr = TimeTransUtils.long2Minutes(songData.songTime)
         binding.tvTotalTime.text = timeStr
     }
@@ -151,6 +178,10 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
             intent.setAction("PLAY")
             startService(intent)
         }
+
+        //歌曲播放完成，进度置零
+        currSongMillsTime = 0
+        binding.sbSeekbar.progress = 0
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -188,5 +219,21 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
         stylusRotate.repeatCount = 0 //设置重复次数
         stylusRotate.fillAfter = true //动画执行完后是否停留在执行完的状态
     }
+
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        LogUtils.d("progress = $progress , fromUser = $fromUser")
+        if (fromUser) {
+            val songTime = clickSongDetailInfo?.songTime
+            musicController.seekTo(progress * 1000)
+            currSongMillsTime = progress * 1000
+        }
+    }
+
+    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+    }
+
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+    }
+
 
 }

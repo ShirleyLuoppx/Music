@@ -193,7 +193,7 @@ data class SongDetailInfo(
     val songAlbum: String = "",
     val picUrl: String = "",
     val songVipStatus: SongVipStatus = SongVipStatus.FREE,
-    val songTime: Long = 0
+    val songTime: Long = 0 //毫秒
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
