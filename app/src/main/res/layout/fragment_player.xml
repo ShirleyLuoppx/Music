@@ -11,8 +11,6 @@
             android:layout_height="30dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="20dp"
-
-
             android:src="@mipmap/ic_arrow_down_white"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,8 +49,10 @@
         <!--        唱针-->
         <ImageView
             android:id="@+id/iv_stylus"
-            android:layout_width="300dp"
-            android:layout_height="150dp"
+            android:layout_width="180dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="50dp"
             android:src="@mipmap/ic_stylus_small"
             app:layout_constraintLeft_toLeftOf="@id/spi_music_rotate"
             app:layout_constraintRight_toRightOf="parent"

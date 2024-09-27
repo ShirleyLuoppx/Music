@@ -1,13 +1,15 @@
 package com.ppx.music.view
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.text.TextUtils
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
 import com.bumptech.glide.Glide
 import com.ppx.music.MusicApplication
 import com.ppx.music.NetRequest
@@ -22,23 +24,29 @@ import com.ppx.music.utils.TimeTransUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import kotlin.text.StringBuilder
+
 
 class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
 
     private var clickSongDetailInfo: SongDetailInfo? = SongDetailInfo()
     private val musicController = MusicController.instance
-    private lateinit var animationSongBg: Animation
-    private lateinit var animationStylus: Animation
+    private lateinit var stylusRotate: RotateAnimation
+    private lateinit var rotateAnimator: ObjectAnimator
+    private val recordSet = AnimatorSet()
 
     override fun initView() {
-        animationSongBg = AnimationUtils.loadAnimation(this, R.anim.anim_rotate_songbg)
-        animationSongBg.interpolator = LinearInterpolator()
-        binding.spiMusicRotate.startAnimation(animationSongBg)
+        // 创建从0度到360度的旋转动画，耗时3秒
+        rotateAnimator = ObjectAnimator.ofFloat(binding.spiMusicRotate, "rotation", 0f, 360f)
+        rotateAnimator.repeatCount = ObjectAnimator.INFINITE // 无限循环播放
+        rotateAnimator.interpolator = LinearInterpolator() // 匀速旋转
+        rotateAnimator.setDuration(20*1000)
+        // 创建AnimatorSet来管理rotateAnimator
+        recordSet.play(rotateAnimator)
+        recordSet.start()
 
-        animationStylus = AnimationUtils.loadAnimation(this, R.anim.anim_rotate_stylus)
-        animationStylus.interpolator = LinearInterpolator()
-        binding.ivStylus.startAnimation(animationStylus)
+        stylusAnim(1)
+        binding.ivStylus.animation = stylusRotate
+        binding.ivStylus.startAnimation(stylusRotate)
     }
 
     override fun initListener() {
@@ -83,12 +91,15 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
                 if (musicController.isPlaying()) {
                     musicController.pauseMusic()
                     binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
-                    binding.spiMusicRotate.clearAnimation()
+                    recordSet.pause()
+                    stylusAnim(0)
                 } else {
                     musicController.resumeMusic()
                     binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
-                    binding.spiMusicRotate.startAnimation(animationSongBg)
+                    recordSet.resume()
+                    stylusAnim(1)
                 }
+                binding.ivStylus.startAnimation(stylusRotate)
             }
 
             R.id.iv_loop_mode -> {
@@ -147,5 +158,35 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener {
         initPlayerData(songDetailInfo)
     }
 
+    /**
+     * status = 1 唱针下拉
+     * status = 0 唱针上拉
+     */
+    private fun stylusAnim(status: Int) {
+        if (status == 1) {
+            stylusRotate = RotateAnimation(
+                0f,
+                30f,
+                Animation.RELATIVE_TO_SELF,
+                0f,
+                Animation.RELATIVE_TO_SELF,
+                0f
+            )
+        } else {
+            stylusRotate = RotateAnimation(
+                30f,
+                0f,
+                Animation.RELATIVE_TO_SELF,
+                0f,
+                Animation.RELATIVE_TO_SELF,
+                0f
+            )
+        }
+        val lin = LinearInterpolator()
+        stylusRotate.interpolator = lin
+        stylusRotate.duration = 1500 //设置动画持续时间
+        stylusRotate.repeatCount = 0 //设置重复次数
+        stylusRotate.fillAfter = true //动画执行完后是否停留在执行完的状态
+    }
 
 }
