@@ -23,6 +23,5 @@ class FindFragment : BaseFragment<FragmentFindBinding>(){
     }
 
     override fun onDestroyFragment() {
-        TODO("Not yet implemented")
     }
 }

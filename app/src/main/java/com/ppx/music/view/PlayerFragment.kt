@@ -18,6 +18,5 @@ class PlayerFragment : BaseFragment<FragmentPlayerBinding>() {
     }
 
     override fun onDestroyFragment() {
-        TODO("Not yet implemented")
     }
 }
