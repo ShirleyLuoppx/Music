@@ -5,6 +5,8 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.text.TextUtils
 import android.view.View
 import android.view.View.OnClickListener
@@ -43,7 +45,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     //当前播放歌曲的毫秒数
     private var currSongMillsTime = 0
     private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
+    private lateinit var message: Message
 
     override fun initView() {
         // 创建从0度到360度的旋转动画，耗时3秒
@@ -59,15 +61,25 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
         binding.ivStylus.animation = stylusRotate
         binding.ivStylus.startAnimation(stylusRotate)
 
-        handler = Handler()
-        runnable = Runnable {
-            LogUtils.d("currSongMillsTime = $currSongMillsTime")
-            currSongMillsTime += 1000
-            binding.sbSeekbar.progress = currSongMillsTime / 1000
-            binding.tvCurrTime.text = TimeTransUtils.long2Minutes(currSongMillsTime.toLong())
-            handler.postDelayed(runnable, 1000)
+        handler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                super.handleMessage(msg)
+                when (msg.what) {
+                    1001 -> {
+                        LogUtils.d("handleMessage currSongMillsTime = $currSongMillsTime")
+                        currSongMillsTime += 1000
+                        binding.tvCurrTime.text =
+                            TimeTransUtils.long2Minutes(currSongMillsTime.toLong())
+                        binding.sbSeekbar.progress = currSongMillsTime / 1000
+                        handler.sendEmptyMessageDelayed(1001, 1000)
+                    }
+                }
+            }
         }
-        handler.postDelayed(runnable, 1000)
+
+        message = handler.obtainMessage()
+        message.what = 1001
+        handler.sendMessage(message)
     }
 
     override fun initListener() {
@@ -116,13 +128,13 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
                     binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
                     recordSet.pause()
                     stylusAnim(0)
-                    handler.removeCallbacks(runnable)
+                    handler.removeMessages(1001)
                 } else {
                     musicController.resumeMusic()
                     binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
                     recordSet.resume()
                     stylusAnim(1)
-                    handler.post(runnable)
+                    handler.sendEmptyMessageDelayed(1001, 1000)
                 }
                 binding.ivStylus.startAnimation(stylusRotate)
             }
@@ -223,7 +235,6 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         LogUtils.d("progress = $progress , fromUser = $fromUser")
         if (fromUser) {
-            val songTime = clickSongDetailInfo?.songTime
             musicController.seekTo(progress * 1000)
             currSongMillsTime = progress * 1000
         }
@@ -237,3 +248,4 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
 
 
 }
+
