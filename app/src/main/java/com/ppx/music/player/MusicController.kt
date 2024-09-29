@@ -32,6 +32,9 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
     private var currentSongIndex = -1
     private var currentSongUrl = ""
 
+    //当前播放模式：0列表循环、1单曲循环、2随机播放
+    private var playMode = 0
+
     companion object {
         val instance: MusicController by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             MusicController()
@@ -94,6 +97,37 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         mediaPlayer?.seekTo(progress)
     }
 
+    fun setPlayMode(mode: Int) {
+        playMode = mode
+    }
+
+    fun playPreSong() {
+        if (playMode == 0 || playMode == 1) {
+            if (currentSongIndex > 0) {
+                currentSongIndex--
+            } else {
+                currentSongIndex = musicDataList.size - 1
+            }
+        } else if (playMode == 2) {
+            currentSongIndex = (0 until musicDataList.size).random()
+        }
+        playSongByIndex(currentSongIndex)
+    }
+
+    fun playNextSong() {
+        if (playMode == 0 || playMode == 1) {
+            if (currentSongIndex < musicDataList.size - 1) {
+                currentSongIndex++
+            } else {
+                currentSongIndex = 0
+            }
+        } else if (playMode == 2) {
+            //在0到musicDataList.size-1之间取一个随机数
+            currentSongIndex = (Math.random() * musicDataList.size).toInt()
+        }
+        playSongByIndex(currentSongIndex)
+    }
+
     override fun onPrepared(p0: MediaPlayer?) {
         LogUtils.d("onPrepared current song has prepared and ready to start playing!!!")
         p0?.start()
@@ -109,17 +143,22 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
 
         LogUtils.d("onCompletion current song index is = $currentSongIndex and size is = ${musicDataList.size}")
 
-        if (currentSongIndex < musicDataList.size - 1) {
-            currentSongIndex++
-            val songDetailInfo = musicDataList[currentSongIndex]
-            val songId = songDetailInfo.songId
-
-            NetRequest.instance.getSongUrlById(songId)
-            EventBus.getDefault().post(songDetailInfo)
-
-        } else {
-            currentSongIndex = 0
+        if (playMode == 0) {
+            if (currentSongIndex < musicDataList.size - 1) {
+                currentSongIndex++
+            } else {
+                currentSongIndex = 0
+            }
+        } else if (playMode == 1) {
+            currentSongIndex = currentSongIndex
+        } else if (playMode == 2) {
+            //在0到musicDataList.size-1之间取一个随机数
+            currentSongIndex = (Math.random() * musicDataList.size).toInt()
         }
+
+        LogUtils.d("onCompletion current playMode is = $playMode and index is = $currentSongIndex")
+
+        playSongByIndex(currentSongIndex)
     }
 
     fun setMusicDataList(musicDataList: ArrayList<SongDetailInfo>) {
@@ -136,6 +175,15 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
 
     fun getCurrentSongIndex(): Int {
         return currentSongIndex
+    }
+
+    private fun playSongByIndex(index: Int) {
+        LogUtils.d("playSongByIndex current index is = $index")
+        val songDetailInfo = musicDataList[index]
+        val songId = songDetailInfo.songId
+
+        NetRequest.instance.getSongUrlById(songId)
+        EventBus.getDefault().post(songDetailInfo)
     }
 
 }

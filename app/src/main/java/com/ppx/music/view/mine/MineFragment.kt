@@ -1,4 +1,4 @@
-package com.ppx.music.view
+package com.ppx.music.view.mine
 
 import android.text.TextUtils
 import android.view.View
@@ -10,6 +10,7 @@ import com.ppx.music.databinding.FragmentMineBinding
 import com.ppx.music.model.MessageEvent
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.ProvincesUtils
+import com.ppx.music.view.BaseFragment
 import com.ppx.music.viewmodel.UserDetailVM
 import okhttp3.Call
 import okhttp3.Callback

@@ -1,4 +1,4 @@
-package com.ppx.music.view
+package com.ppx.music.view.recommend
 
 import android.content.Intent
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +12,8 @@ import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
+import com.ppx.music.view.BaseFragment
+import com.ppx.music.view.PlayerActivity
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient

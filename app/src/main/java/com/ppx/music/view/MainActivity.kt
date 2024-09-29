@@ -7,6 +7,9 @@ import androidx.fragment.app.FragmentTransaction
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityMainBinding
 import com.ppx.music.utils.LogUtils
+import com.ppx.music.view.find.FindFragment
+import com.ppx.music.view.mine.MineFragment
+import com.ppx.music.view.recommend.RecommendFragment
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 

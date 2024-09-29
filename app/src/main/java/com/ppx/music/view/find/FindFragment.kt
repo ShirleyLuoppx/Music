@@ -1,12 +1,8 @@
-package com.ppx.music.view
+package com.ppx.music.view.find
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.ppx.music.R
 import com.ppx.music.databinding.FragmentFindBinding
+import com.ppx.music.view.BaseFragment
 
 class FindFragment : BaseFragment<FragmentFindBinding>(){
     override fun initView() {

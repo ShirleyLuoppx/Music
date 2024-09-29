@@ -47,39 +47,13 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     private lateinit var handler: Handler
     private lateinit var message: Message
 
+    //歌曲播放模式：0列表循环、1单曲循环、2随机播放
+    private var playMode = 0
+
     override fun initView() {
-        // 创建从0度到360度的旋转动画，耗时3秒
-        rotateAnimator = ObjectAnimator.ofFloat(binding.spiMusicRotate, "rotation", 0f, 360f)
-        rotateAnimator.repeatCount = ObjectAnimator.INFINITE // 无限循环播放
-        rotateAnimator.interpolator = LinearInterpolator() // 匀速旋转
-        rotateAnimator.setDuration(20 * 1000)
-        // 创建AnimatorSet来管理rotateAnimator
-        recordSet.play(rotateAnimator)
-        recordSet.start()
+        execAnim()
+        handlerUpdateUi()
 
-        stylusAnim(1)
-        binding.ivStylus.animation = stylusRotate
-        binding.ivStylus.startAnimation(stylusRotate)
-
-        handler = object : Handler(Looper.getMainLooper()) {
-            override fun handleMessage(msg: Message) {
-                super.handleMessage(msg)
-                when (msg.what) {
-                    1001 -> {
-                        LogUtils.d("handleMessage currSongMillsTime = $currSongMillsTime")
-                        currSongMillsTime += 1000
-                        binding.tvCurrTime.text =
-                            TimeTransUtils.long2Minutes(currSongMillsTime.toLong())
-                        binding.sbSeekbar.progress = currSongMillsTime / 1000
-                        handler.sendEmptyMessageDelayed(1001, 1000)
-                    }
-                }
-            }
-        }
-
-        message = handler.obtainMessage()
-        message.what = 1001
-        handler.sendMessage(message)
     }
 
     override fun initListener() {
@@ -123,38 +97,106 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
         when (view?.id) {
             R.id.iv_play_song -> {
                 LogUtils.d("onclick iv_play_song . playingStatus = ${musicController.isPlaying()}")
-                if (musicController.isPlaying()) {
-                    musicController.pauseMusic()
-                    binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
-                    recordSet.pause()
-                    stylusAnim(0)
-                    handler.removeMessages(1001)
-                } else {
-                    musicController.resumeMusic()
-                    binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
-                    recordSet.resume()
-                    stylusAnim(1)
-                    handler.sendEmptyMessageDelayed(1001, 1000)
-                }
-                binding.ivStylus.startAnimation(stylusRotate)
+                clickBtnPlayPause()
             }
 
             R.id.iv_loop_mode -> {
-                LogUtils.d("onclick iv_loop_mode}")
+                LogUtils.d("onclick iv_loop_mode playMode  = $playMode")
+                clickBtnMode()
             }
 
             R.id.iv_pre_song -> {
-                LogUtils.d("onclick iv_pre_song}")
+                LogUtils.d("onclick iv_pre_song")
+                musicController.playPreSong()
             }
 
             R.id.iv_next_song -> {
-                LogUtils.d("onclick iv_next_song}")
+                LogUtils.d("onclick iv_next_song")
+                musicController.playNextSong()
             }
 
             R.id.iv_playing_song_list -> {
                 LogUtils.d("onclick iv_playing_song_list}")
             }
         }
+    }
+
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//        LogUtils.d("progress = $progress , fromUser = $fromUser")
+        if (fromUser) {
+            musicController.seekTo(progress * 1000)
+            currSongMillsTime = progress * 1000
+        }
+    }
+
+    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+    }
+
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+    }
+
+    private fun clickBtnPlayPause() {
+        if (musicController.isPlaying()) {
+            musicController.pauseMusic()
+            binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
+            recordSet.pause()
+            stylusAnim(0)
+            handler.removeMessages(1001)
+        } else {
+            musicController.resumeMusic()
+            binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
+            recordSet.resume()
+            stylusAnim(1)
+            handler.sendEmptyMessageDelayed(1001, 1000)
+        }
+        binding.ivStylus.startAnimation(stylusRotate)
+    }
+
+    private fun clickBtnMode() {
+        //歌曲播放模式：0列表循环、1单曲循环、2随机播放
+        when (playMode) {
+            0 -> {
+                playMode = 1
+                binding.ivLoopMode.setImageResource(R.mipmap.ic_playmode_single_loop)
+            }
+
+            1 -> {
+                playMode = 2
+                binding.ivLoopMode.setImageResource(R.mipmap.ic_playmode_random)
+            }
+
+            2 -> {
+                playMode = 0
+                binding.ivLoopMode.setImageResource(R.mipmap.ic_playmode_sequence)
+            }
+        }
+        LogUtils.d("after click iv_loop_mode playMode = $playMode")
+        musicController.setPlayMode(playMode)
+    }
+
+    /**
+     * 更新当前播放时间、和progress进度显示
+     */
+    private fun handlerUpdateUi() {
+        handler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                super.handleMessage(msg)
+                when (msg.what) {
+                    1001 -> {
+//                        LogUtils.d("handleMessage currSongMillsTime = $currSongMillsTime")
+                        currSongMillsTime += 1000
+                        binding.tvCurrTime.text =
+                            TimeTransUtils.long2Minutes(currSongMillsTime.toLong())
+                        binding.sbSeekbar.progress = currSongMillsTime / 1000
+                        handler.sendEmptyMessageDelayed(1001, 1000)
+                    }
+                }
+            }
+        }
+
+        message = handler.obtainMessage()
+        message.what = 1001
+        handler.sendMessage(message)
     }
 
     private fun getSongUrlById(id: String) {
@@ -232,18 +274,20 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
         stylusRotate.fillAfter = true //动画执行完后是否停留在执行完的状态
     }
 
-    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        LogUtils.d("progress = $progress , fromUser = $fromUser")
-        if (fromUser) {
-            musicController.seekTo(progress * 1000)
-            currSongMillsTime = progress * 1000
-        }
-    }
+    //执行动画，唱片和唱针的动画
+    private fun execAnim() {
+        // 创建从0度到360度的旋转动画，耗时3秒
+        rotateAnimator = ObjectAnimator.ofFloat(binding.spiMusicRotate, "rotation", 0f, 360f)
+        rotateAnimator.repeatCount = ObjectAnimator.INFINITE // 无限循环播放
+        rotateAnimator.interpolator = LinearInterpolator() // 匀速旋转
+        rotateAnimator.setDuration(20 * 1000)
+        // 创建AnimatorSet来管理rotateAnimator
+        recordSet.play(rotateAnimator)
+        recordSet.start()
 
-    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-    }
-
-    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+        stylusAnim(1)
+        binding.ivStylus.animation = stylusRotate
+        binding.ivStylus.startAnimation(stylusRotate)
     }
 
 

@@ -1,30 +1,14 @@
-package com.ppx.music.view
+package com.ppx.music.view.recommend
 
 import android.os.Bundle
-import android.text.TextUtils.replace
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import com.alibaba.fastjson.JSONObject
 import com.ppx.music.R
-import com.ppx.music.common.ApiConstants
-import com.ppx.music.common.Constants
 import com.ppx.music.databinding.FragmentRecommendBinding
-import com.ppx.music.model.SongDetailInfo
-import com.ppx.music.utils.LogUtils
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
 
 
 /**

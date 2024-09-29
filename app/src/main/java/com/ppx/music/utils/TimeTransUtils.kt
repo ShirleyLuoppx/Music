@@ -32,7 +32,7 @@ object TimeTransUtils {
         }
 
         val timeStr = "$minuteStr:$secondStr"
-        LogUtils.d("$TAG long2Minutes minutes = $timeStr")
+//        LogUtils.d("$TAG long2Minutes minutes = $timeStr")
         return timeStr
     }
 }
