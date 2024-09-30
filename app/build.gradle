@@ -94,5 +94,34 @@ dependencies {
 //    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.0"
 //    implementation "androidx.databind:databinding-runtime:3.4.1"
 
+    //retrofit2
+    implementation "com.squareup.retrofit2:retrofit:2.7.1"
+    implementation "com.squareup.retrofit2:converter-gson:2.6.2"
+
+    //leakcanary 内存泄漏检测用的 TODO：空了可以来自己制造一个内存泄漏，然后看看效果
+    implementation "com.squareup.leakcanary:leakcanary-android:2.0-alpha-3"
+
+    //PersistentCookieJar:持久化存储cookies，就算设备关机或者重启后也能拿到cookies数据，TODO：空了来试试
+    implementation "com.github.franmontiel:PersistentCookieJar:v1.0.1"
+
+    //licensesdialog 显示许可证信息的库 TODO：空了试试
+    implementation "de.psdev.licensesdialog:licensesdialog"
+
+    //livedata
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+
+    //viewpager2
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+
+    //koin
+    implementation "org.koin:koin-android:2.0.1"
+    implementation "org.koin:koin-androidx-scope:2.0.1"
+    implementation "org.koin:koin-androidx-viewmodel:2.0.1"
+
+
+
+
+
+
 
 }
