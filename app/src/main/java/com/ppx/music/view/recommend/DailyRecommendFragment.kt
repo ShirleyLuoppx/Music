@@ -10,6 +10,7 @@ import com.ppx.music.common.Constants
 import com.ppx.music.databinding.FragmentDailyRecommendBinding
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
+import com.ppx.music.mvvm.DailyRecommendViewModel
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
@@ -19,6 +20,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  *
@@ -28,6 +30,7 @@ import okhttp3.Response
  */
 class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
+    private val dailyRecommendViewModel by viewModel<DailyRecommendViewModel>()
     private val songsInfoList = ArrayList<SongDetailInfo>()
     val dailyRecommendAdapter = DailyRecommendAdapter()
 
@@ -59,6 +62,7 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
     override fun initData() {
         getDailyRecommendSongs()
+        dailyRecommendViewModel.getDailyRecommendSongs()
     }
 
     override fun getLayoutId(): Int {
