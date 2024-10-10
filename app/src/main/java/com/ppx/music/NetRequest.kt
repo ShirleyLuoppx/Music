@@ -27,6 +27,8 @@ import org.json.JSONObject
  * @Desc：okhttp网络请求工具类
  */
 class NetRequest {
+    //最好是全局唯一client对象
+    private val okHttpClient = OkHttpClient()
 
     companion object {
         val instance: NetRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -39,7 +41,7 @@ class NetRequest {
         val requestBody = FormBody.Builder()
             .add("id", id)
             .build()
-        val okHttpClient = OkHttpClient()
+
         val request = Request.Builder()
             .url(ApiConstants.GET_URL_BY_SONG_ID)
             .post(requestBody)
@@ -80,7 +82,6 @@ class NetRequest {
             .url(apiUrl)
             .post(create(mediaType, requestBody))
             .build()
-        val okHttpClient = OkHttpClient()
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: java.io.IOException) {
                 LogUtils.d("onFailure: " + e.message.toString())
@@ -101,7 +102,6 @@ class NetRequest {
 
     //检测手机号码是否已注册
     fun checkPhone(phoneValue: String) {
-        val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add("phone", phoneValue)
             .add("timestamp", System.currentTimeMillis().toString())
@@ -142,7 +142,6 @@ class NetRequest {
     }
 
     fun sendVerifyCode(value: String) {
-        val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add("phone", value)
             .add("timestamp", System.currentTimeMillis().toString())
@@ -186,7 +185,6 @@ class NetRequest {
      */
     fun getUserIdByNickName(nickName: String): Int {
         var userId = -1
-        val okHttpClient = OkHttpClient()
         val request: Request = Request.Builder()
             .url(ApiConstants.GET_USERID_BY_NICKNAME + "?nicknames=" + nickName)
             .get() //默认就是GET请求，可以不写
@@ -220,7 +218,6 @@ class NetRequest {
             .get()
             .build()
 
-        val okHttpClient = OkHttpClient()
         okHttpClient.newCall(request).enqueue(object :Callback{
             override fun onFailure(call: Call, e: java.io.IOException) {
                 LogUtils.d("getUserDetail onFailure: " + e.message)
@@ -239,7 +236,6 @@ class NetRequest {
      */
     fun getLoginStatus(): Boolean {
         var result = false
-        val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add("timestamp", System.currentTimeMillis().toString())
             .build()
@@ -290,7 +286,6 @@ class NetRequest {
     }
 
     fun logout() {
-        val okHttpClient = OkHttpClient()
         val request: Request = Request.Builder()
             .url(ApiConstants.LOGOUT_URL)
             .get() //默认就是GET请求，可以不写
@@ -309,7 +304,6 @@ class NetRequest {
     }
 
     fun sendRequestWithOneParam(apiUrl: String, key: String, value: String) {
-        val okHttpClient = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add(key, value)
             .add("timestamp", System.currentTimeMillis().toString())

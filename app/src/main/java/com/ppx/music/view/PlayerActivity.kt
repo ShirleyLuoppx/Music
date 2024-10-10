@@ -118,6 +118,9 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
             R.id.iv_playing_song_list -> {
                 LogUtils.d("onclick iv_playing_song_list}")
             }
+            R.id.iv_down_white -> {
+                finish()
+            }
         }
     }
 

@@ -59,13 +59,13 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
      * 获取用户详情
      * /user/detail?uid=494817816
      */
+    private val okHttpClient = OkHttpClient()
     private fun getUserDetail(uid: Int) {
         val request: Request = Request.Builder()
             .url(ApiConstants.GET_USER_DETAIL + "?uid=" + uid)
             .get()
             .build()
 
-        val okHttpClient = OkHttpClient()
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 LogUtils.d("getUserDetail onFailure: " + e.message)

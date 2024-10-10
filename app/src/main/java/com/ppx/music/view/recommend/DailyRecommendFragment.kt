@@ -76,8 +76,8 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
     }
 
 
+    private val okHttpClient = OkHttpClient()
     private fun getDailyRecommendSongs() {
-        val okHttpClient = OkHttpClient()
         val request = Request.Builder()
             .url(ApiConstants.GET_DAILY_RECOMMEND_SONGS)
             .get()
