@@ -16,7 +16,7 @@ interface HttpService {
     }
 
     @GET("/recommend/songs")
-    suspend fun getCollectArticles(): HttpResponse<SongDetailInfo>
+    suspend fun getCollectArticles(): HttpResponse<String>
 
 
 }

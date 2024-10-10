@@ -1,7 +1,7 @@
 package com.ppx.music.http
 
-import android.net.sip.SipErrorCode.TIME_OUT
-import androidx.databinding.ktx.BuildConfig
+//import androidx.databinding.ktx.BuildConfig
+//import com.chad.library.adapter4.BuildConfig
 import com.ppx.music.mvvm.HttpService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,23 +17,24 @@ import java.util.concurrent.TimeUnit
  */
 object RetrofitClient {
 
+    private const val TIME_OUT = 5
     private val client: OkHttpClient
         get() {
             val builder = OkHttpClient.Builder()
-            val logging = HttpLoggingInterceptor()
-            if (BuildConfig.DEBUG) {
-                logging.level = HttpLoggingInterceptor.Level.BODY
-            } else {
-                logging.level = HttpLoggingInterceptor.Level.BASIC
-            }
+//            val logging = HttpLoggingInterceptor()
+//            if (BuildConfig.DEBUG) {
+//                logging.level = HttpLoggingInterceptor.Level.BODY
+//            } else {
+//                logging.level = HttpLoggingInterceptor.Level.BASIC
+//            }
 
-            builder.addInterceptor(logging)
-                .connectTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
+//            builder.addInterceptor(logging)
+            builder  .connectTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
 
             return builder.build()
         }
 
-    fun <S> getService(serviceClass: Class<S>, baseUrl: String): S {
+    private fun <S> getService(serviceClass: Class<S>, baseUrl: String): S {
         return Retrofit.Builder()
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())

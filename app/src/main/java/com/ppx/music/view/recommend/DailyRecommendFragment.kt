@@ -1,6 +1,7 @@
 package com.ppx.music.view.recommend
 
 import android.content.Intent
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONObject
 import com.ppx.music.R
@@ -30,11 +31,13 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
-    private val dailyRecommendViewModel by viewModel<DailyRecommendViewModel>()
+//    private val dailyRecommendViewModel by viewModel<DailyRecommendViewModel>()
+    private val dailyRecommendViewModel  = DailyRecommendViewModel()
     private val songsInfoList = ArrayList<SongDetailInfo>()
     val dailyRecommendAdapter = DailyRecommendAdapter()
 
     override fun initView() {
+
         initRv()
     }
 
@@ -62,7 +65,7 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
     override fun initData() {
         getDailyRecommendSongs()
-        dailyRecommendViewModel.getDailyRecommendSongs()
+//       val data  = dailyRecommendViewModel.getDailyRecommendSongs()
     }
 
     override fun getLayoutId(): Int {
