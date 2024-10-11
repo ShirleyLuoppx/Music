@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.animation.Animation
@@ -15,17 +16,23 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.lifecycle.lifecycleScope
+import com.alibaba.fastjson.JSONObject
 import com.bumptech.glide.Glide
 import com.ppx.music.MusicApplication
 import com.ppx.music.NetRequest
 import com.ppx.music.R
 import com.ppx.music.databinding.FragmentPlayerBinding
+import com.ppx.music.http.NetworkService
 import com.ppx.music.model.PlaySongUrlEvent
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.player.MusicController
 import com.ppx.music.player.MusicPlayerService
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.TimeTransUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -118,6 +125,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
             R.id.iv_playing_song_list -> {
                 LogUtils.d("onclick iv_playing_song_list}")
             }
+
             R.id.iv_down_white -> {
                 finish()
             }
@@ -203,8 +211,29 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     }
 
     private fun getSongUrlById(id: String) {
-        LogUtils.d("PlayerActivity getSongUrlById id = $id")
-        NetRequest.instance.getSongUrlById(id)
+        LogUtils.d("playMusic PlayerActivity getSongUrlById id = $id")
+
+        lifecycleScope.launch {
+            val networkService = NetworkService.createService()
+            val newsEntity = networkService.getNewsService(id)
+            Log.d("TAG", "getSongUrlById: $newsEntity")
+
+
+            val jsonObjectStr = JSONObject.parseObject(newsEntity.toString())
+            val dataStr = jsonObjectStr["data"].toString()
+            val dataArray = JSONObject.parseArray(dataStr)
+            if (dataArray.size > 0) {
+                val data = dataArray[0].toString()
+                val dataObj = JSONObject.parseObject(data)
+                val url = dataObj["url"].toString()
+                LogUtils.d("66666666666666666666   playMusic NetRequest getSongUrlById url = $url")
+
+                EventBus.getDefault().post(PlaySongUrlEvent(url))
+            } else {
+                LogUtils.d("getSongUrlById dataArray.size = 0")
+            }
+        }
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  哈哈    放鞭炮！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
     }
 
     private fun initPlayerData(songData: SongDetailInfo) {
@@ -227,7 +256,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onPlaySongUrlEvent(event: PlaySongUrlEvent) {
-        LogUtils.d("onPlaySongUrlEvent url = ${event.url}")
+        LogUtils.d("playMusic onPlaySongUrlEvent url = ${event.url}")
         if (!TextUtils.isEmpty(event.url)) {
             //使用豆包提供的原生的mediaPlayer也可以正常播放...
             val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)

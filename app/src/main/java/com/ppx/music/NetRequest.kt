@@ -13,6 +13,10 @@ import com.ppx.music.player.MusicController
 import com.ppx.music.player.MusicPlayerService
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.SPUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.create
@@ -36,41 +40,45 @@ class NetRequest {
         }
     }
 
-    fun getSongUrlById(id: String)  {
-        LogUtils.d("---------------------------------getSongUrlById id = $id")
-        val requestBody = FormBody.Builder()
-            .add("id", id)
-            .build()
+    suspend fun getSongUrlById(id: String) {
 
-        val request = Request.Builder()
-            .url(ApiConstants.GET_URL_BY_SONG_ID)
-            .post(requestBody)
-            .build()
-        okHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: java.io.IOException) {
-                LogUtils.d("getSongUrlById onFailure")
-            }
+        return withContext(Dispatchers.IO) {
 
-            override fun onResponse(call: Call, response: Response) {
-                val bodyStr = response.body?.string()
-                LogUtils.d("getSongUrlById onResponse body = $bodyStr")
-
-                val jsonObjectStr = com.alibaba.fastjson.JSONObject.parseObject(bodyStr)
-                val dataStr = jsonObjectStr["data"].toString()
-                val dataArray = com.alibaba.fastjson.JSONObject.parseArray(dataStr)
-                if (dataArray.size > 0) {
-                    val data = dataArray[0].toString()
-                    val dataObj = com.alibaba.fastjson.JSONObject.parseObject(data)
-                    val url = dataObj["url"].toString()
-                    LogUtils.d(" NetRequest getSongUrlById url = $url")
-
-                    EventBus.getDefault().post(PlaySongUrlEvent(url))
-
-                } else {
-                    LogUtils.d("getSongUrlById dataArray.size = 0")
+            val requestBody = FormBody.Builder()
+                .add("id", id)
+                .add("timestamp", System.currentTimeMillis().toString())
+                .build()
+            val request = Request.Builder()
+                .url(ApiConstants.GET_URL_BY_SONG_ID)
+                .post(requestBody)
+                .header("Cache-Control", "no-cache")//禁用okhttp缓存
+                .header("timestamp",System.currentTimeMillis().toString())
+                .build()
+            okHttpClient.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: java.io.IOException) {
+                    LogUtils.d("getSongUrlById onFailure")
                 }
-            }
-        })
+
+                override fun onResponse(call: Call, response: Response) {
+                    val bodyStr = response.body?.string()
+                    LogUtils.d("getSongUrlById onResponse body = $bodyStr")
+
+                    val jsonObjectStr = com.alibaba.fastjson.JSONObject.parseObject(bodyStr)
+                    val dataStr = jsonObjectStr["data"].toString()
+                    val dataArray = com.alibaba.fastjson.JSONObject.parseArray(dataStr)
+                    if (dataArray.size > 0) {
+                        val data = dataArray[0].toString()
+                        val dataObj = com.alibaba.fastjson.JSONObject.parseObject(data)
+                        val url = dataObj["url"].toString()
+                        LogUtils.d("playMusic NetRequest getSongUrlById url = $url")
+
+                        EventBus.getDefault().post(PlaySongUrlEvent(url))
+                    } else {
+                        LogUtils.d("getSongUrlById dataArray.size = 0")
+                    }
+                }
+            })
+        }
     }
 
     /**
@@ -178,7 +186,6 @@ class NetRequest {
     }
 
 
-
     /**
      * 根据用户昵称获取用户id
      *    /get/userids?nicknames=binaryify
@@ -200,7 +207,7 @@ class NetRequest {
             override fun onResponse(call: Call, response: Response) {
 //                LogUtils.d("getUserIdByNickName onResponse: " + response.body!!.string())
 
-                iNetCallBack.onSuccess(call,response)
+                iNetCallBack.onSuccess(call, response)
             }
         })
 
@@ -213,15 +220,15 @@ class NetRequest {
      */
     fun getUserDetail(uid: Int) {
 
-        val request:Request = Request.Builder()
+        val request: Request = Request.Builder()
             .url(ApiConstants.GET_USER_DETAIL + "?uid=" + uid)
             .get()
             .build()
 
-        okHttpClient.newCall(request).enqueue(object :Callback{
+        okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: java.io.IOException) {
                 LogUtils.d("getUserDetail onFailure: " + e.message)
-                iNetCallBack.onFailure(call,e)
+                iNetCallBack.onFailure(call, e)
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -340,7 +347,7 @@ class NetRequest {
         })
     }
 
-    fun sendOkHttpConnection(address: String, vararg params :String,callback: Callback) {
+    fun sendOkHttpConnection(address: String, vararg params: String, callback: Callback) {
         val client = OkHttpClient()
         val request = Request.Builder()
             .url(address)
@@ -355,7 +362,7 @@ class NetRequest {
     }
 
     lateinit var iNetCallBack: INetCallBack
-    fun setOnNetCallBack(callBack: INetCallBack){
+    fun setOnNetCallBack(callBack: INetCallBack) {
         iNetCallBack = callBack
     }
 }

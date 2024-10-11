@@ -10,6 +10,9 @@ import com.ppx.music.NetRequest
 import com.ppx.music.model.PlaySongUrlEvent
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.utils.LogUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -182,8 +185,13 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         val songDetailInfo = musicDataList[index]
         val songId = songDetailInfo.songId
 
-        NetRequest.instance.getSongUrlById(songId)
+        GlobalScope.launch(Dispatchers.Main) {
+            NetRequest.instance.getSongUrlById(songId)
+        }
         EventBus.getDefault().post(songDetailInfo)
+
+
+
     }
 
 }
