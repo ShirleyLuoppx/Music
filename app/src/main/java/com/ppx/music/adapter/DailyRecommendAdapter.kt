@@ -27,7 +27,7 @@ class DailyRecommendAdapter : BaseQuickAdapter<SongDetailInfo, QuickViewHolder>(
         val ivAlbumPic : ImageView = holder.getView(R.id.iv_album_pic)
         tvSongName.text = item?.songName
         tvAlbumName.text = item?.songAlbum
-        Glide.with(context).load(item?.picUrl).into(ivAlbumPic)
+        Glide.with(context).load(item?.picUrl).override(50,50).into(ivAlbumPic)
 
 //        ivAlbumPic.setImageURI(Uri.parse(item?.picUrl))
 

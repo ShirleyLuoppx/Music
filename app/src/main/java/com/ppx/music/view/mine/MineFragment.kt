@@ -2,6 +2,7 @@ package com.ppx.music.view.mine
 
 import android.text.TextUtils
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.alibaba.fastjson.JSON
 import com.bumptech.glide.Glide
 import com.ppx.music.R
@@ -12,6 +13,8 @@ import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.ProvincesUtils
 import com.ppx.music.view.BaseFragment
 import com.ppx.music.viewmodel.UserDetailVM
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -38,7 +41,7 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
     }
 
     override fun initData() {
-        EventBus.getDefault().register(this)
+//        EventBus.getDefault().register(this)
 //        viewmodel = ViewModelProvider(this)[UserDetailVM::class.java]
 //        binding.viewModel = viewmodel
 //        binding.lifecycleOwner = this
@@ -52,7 +55,7 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
     }
 
     override fun onDestroyFragment() {
-        EventBus.getDefault().unregister(this)
+//        EventBus.getDefault().unregister(this)
     }
 
     /**
@@ -76,18 +79,22 @@ class MineFragment : BaseFragment<FragmentMineBinding>() {
 
                 val body = response.body!!.string()
                 //暂时先这样用eventbus把数据传出去更新，后续改成mvvm
-                EventBus.getDefault().post(MessageEvent(body))
+
+                lifecycleScope.launch(Dispatchers.Main) {
+                    LogUtils.d("bodyString = ${body}")
+                    if(!TextUtils.isEmpty(body)){
+                        analysisUserInfo(body)
+                    }
+                }
+//                EventBus.getDefault().post(MessageEvent(body))
             }
         })
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onMessageEvent(event:MessageEvent ){
-        LogUtils.d("bodyString = ${event.body}")
-        if(!TextUtils.isEmpty(event.body)){
-            analysisUserInfo(event.body!!)
-        }
-    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    fun onMessageEvent(event:MessageEvent ){
+//
+//    }
 
     private fun analysisUserInfo(info: String) {
         val json = JSON.parseObject(info)
