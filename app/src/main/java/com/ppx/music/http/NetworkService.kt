@@ -13,8 +13,6 @@ import retrofit2.http.Query
  */
 interface NetworkService {
 
-    //http://119.91.147.152:3000/song/url?id=2602622157
-
     @GET("song/url")
     suspend fun getNewsService(
         @Query(value = "id") id : String

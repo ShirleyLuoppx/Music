@@ -5,17 +5,15 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.text.TextUtils
+import com.alibaba.fastjson.JSONObject
 import com.ppx.music.MusicApplication
-import com.ppx.music.NetRequest
-import com.ppx.music.model.PlaySongUrlEvent
+import com.ppx.music.http.NetworkService
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.utils.LogUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import java.io.IOException
 
 /**
@@ -28,13 +26,12 @@ import java.io.IOException
 class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
     MediaPlayer.OnCompletionListener {
 
+    private val TAG = "MusicController"
     private var mediaPlayer: MediaPlayer? = null
+    //当前播放列表数据
     private var musicDataList: ArrayList<SongDetailInfo> = ArrayList()
-
     //当前播放的歌曲索引
     private var currentSongIndex = -1
-    private var currentSongUrl = ""
-
     //当前播放模式：0列表循环、1单曲循环、2随机播放
     private var playMode = 0
 
@@ -67,7 +64,7 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
                 mediaPlayer?.setDataSource(url)
                 mediaPlayer?.prepareAsync()
             } else {
-                LogUtils.e("playMusic : url is empty !!!")
+                LogUtils.e(TAG, "playMusic : url is empty !!!")
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -104,7 +101,7 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         playMode = mode
     }
 
-    fun playPreSong() {
+    fun playPreSong(): Int {
         if (playMode == 0 || playMode == 1) {
             if (currentSongIndex > 0) {
                 currentSongIndex--
@@ -115,9 +112,10 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
             currentSongIndex = (0 until musicDataList.size).random()
         }
         playSongByIndex(currentSongIndex)
+        return currentSongIndex
     }
 
-    fun playNextSong() {
+    fun playNextSong():Int {
         if (playMode == 0 || playMode == 1) {
             if (currentSongIndex < musicDataList.size - 1) {
                 currentSongIndex++
@@ -129,22 +127,26 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
             currentSongIndex = (Math.random() * musicDataList.size).toInt()
         }
         playSongByIndex(currentSongIndex)
+        return currentSongIndex
     }
 
     override fun onPrepared(p0: MediaPlayer?) {
-        LogUtils.d("onPrepared current song has prepared and ready to start playing!!!")
+        LogUtils.d(TAG, "onPrepared current song has prepared and ready to start playing!!!")
         p0?.start()
     }
 
     override fun onError(p0: MediaPlayer?, p1: Int, p2: Int): Boolean {
-        LogUtils.e("Error occurred while playing music: what = $p1 , extra = $p2")
+        LogUtils.e(TAG, "Error occurred while playing music: what = $p1 , extra = $p2")
         return false
     }
 
     override fun onCompletion(p0: MediaPlayer?) {
-        LogUtils.d("onCompletion current song has finished ....")
+        LogUtils.d(TAG, "onCompletion current song has finished ....")
 
-        LogUtils.d("onCompletion current song index is = $currentSongIndex and size is = ${musicDataList.size}")
+        LogUtils.d(
+            TAG,
+            "onCompletion current song index is = $currentSongIndex and size is = ${musicDataList.size}"
+        )
 
         if (playMode == 0) {
             if (currentSongIndex < musicDataList.size - 1) {
@@ -159,7 +161,10 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
             currentSongIndex = (Math.random() * musicDataList.size).toInt()
         }
 
-        LogUtils.d("onCompletion current playMode is = $playMode and index is = $currentSongIndex")
+        LogUtils.d(
+            TAG,
+            "onCompletion current playMode is = $playMode and index is = $currentSongIndex"
+        )
 
         playSongByIndex(currentSongIndex)
     }
@@ -181,17 +186,49 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
     }
 
     private fun playSongByIndex(index: Int) {
-        LogUtils.d("playSongByIndex current index is = $index")
+        LogUtils.d(TAG, "playSongByIndex current index is = $index")
         val songDetailInfo = musicDataList[index]
         val songId = songDetailInfo.songId
 
+        //使用GlobalScope 会创建一个自定义的协程域，虽然用起来方便，但是可能会导致资源泄漏，因为它不会自动取消，也不会自动回收资源。所以最好还是在activity或者fragment中去使用lifecycleScope，防止泄漏
         GlobalScope.launch(Dispatchers.Main) {
-            NetRequest.instance.getSongUrlById(songId)
+            getSongUrlById(songId)
         }
         EventBus.getDefault().post(songDetailInfo)
+    }
 
+    suspend fun getSongUrlById(id: String): String {
+        var songUrl = ""
+        LogUtils.d(TAG, "getSongUrlById id = $id")
 
+        val networkService = NetworkService.createService()
+        val newsEntity = networkService.getNewsService(id)
 
+        val jsonObjectStr = JSONObject.parseObject(newsEntity.toString())
+        val dataStr = jsonObjectStr["data"].toString()
+        val dataArray = JSONObject.parseArray(dataStr)
+        if (dataArray.size > 0) {
+            val data = dataArray[0].toString()
+            val dataObj = JSONObject.parseObject(data)
+            val url = dataObj["url"].toString()
+            LogUtils.d(TAG, "getSongUrlById url = $url")
+            songUrl = url
+
+            startService(url)
+        } else {
+            LogUtils.d(TAG, "getSongUrlById dataArray.size = 0")
+        }
+        return songUrl
+    }
+
+    private fun startService(url: String) {
+        if (!TextUtils.isEmpty(url)) {
+            //使用豆包提供的原生的mediaPlayer也可以正常播放...
+            val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
+            intent.putExtra("url", url)
+            intent.setAction("PLAY")
+            MusicApplication.context.startService(intent)
+        }
     }
 
 }

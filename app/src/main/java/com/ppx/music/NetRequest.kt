@@ -40,46 +40,46 @@ class NetRequest {
         }
     }
 
-    suspend fun getSongUrlById(id: String) {
-
-        return withContext(Dispatchers.IO) {
-
-            val requestBody = FormBody.Builder()
-                .add("id", id)
-                .add("timestamp", System.currentTimeMillis().toString())
-                .build()
-            val request = Request.Builder()
-                .url(ApiConstants.GET_URL_BY_SONG_ID)
-                .post(requestBody)
-                .header("Cache-Control", "no-cache")//禁用okhttp缓存
-                .header("timestamp",System.currentTimeMillis().toString())
-                .build()
-            okHttpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: java.io.IOException) {
-                    LogUtils.d("getSongUrlById onFailure")
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    val bodyStr = response.body?.string()
-                    LogUtils.d("getSongUrlById onResponse body = $bodyStr")
-
-                    val jsonObjectStr = com.alibaba.fastjson.JSONObject.parseObject(bodyStr)
-                    val dataStr = jsonObjectStr["data"].toString()
-                    val dataArray = com.alibaba.fastjson.JSONObject.parseArray(dataStr)
-                    if (dataArray.size > 0) {
-                        val data = dataArray[0].toString()
-                        val dataObj = com.alibaba.fastjson.JSONObject.parseObject(data)
-                        val url = dataObj["url"].toString()
-                        LogUtils.d("playMusic NetRequest getSongUrlById url = $url")
-
-                        EventBus.getDefault().post(PlaySongUrlEvent(url))
-                    } else {
-                        LogUtils.d("getSongUrlById dataArray.size = 0")
-                    }
-                }
-            })
-        }
-    }
+//    suspend fun getSongUrlById(id: String) {
+//
+//        return withContext(Dispatchers.IO) {
+//
+//            val requestBody = FormBody.Builder()
+//                .add("id", id)
+//                .add("timestamp", System.currentTimeMillis().toString())
+//                .build()
+//            val request = Request.Builder()
+//                .url(ApiConstants.GET_URL_BY_SONG_ID)
+//                .post(requestBody)
+//                .header("Cache-Control", "no-cache")//禁用okhttp缓存
+//                .header("timestamp",System.currentTimeMillis().toString())
+//                .build()
+//            okHttpClient.newCall(request).enqueue(object : Callback {
+//                override fun onFailure(call: Call, e: java.io.IOException) {
+//                    LogUtils.d("getSongUrlById onFailure")
+//                }
+//
+//                override fun onResponse(call: Call, response: Response) {
+//                    val bodyStr = response.body?.string()
+//                    LogUtils.d("getSongUrlById onResponse body = $bodyStr")
+//
+//                    val jsonObjectStr = com.alibaba.fastjson.JSONObject.parseObject(bodyStr)
+//                    val dataStr = jsonObjectStr["data"].toString()
+//                    val dataArray = com.alibaba.fastjson.JSONObject.parseArray(dataStr)
+//                    if (dataArray.size > 0) {
+//                        val data = dataArray[0].toString()
+//                        val dataObj = com.alibaba.fastjson.JSONObject.parseObject(data)
+//                        val url = dataObj["url"].toString()
+//                        LogUtils.d("playMusic NetRequest getSongUrlById url = $url")
+//
+//                        EventBus.getDefault().post(PlaySongUrlEvent(url))
+//                    } else {
+//                        LogUtils.d("getSongUrlById dataArray.size = 0")
+//                    }
+//                }
+//            })
+//        }
+//    }
 
     /**
      * 获取手机验证码

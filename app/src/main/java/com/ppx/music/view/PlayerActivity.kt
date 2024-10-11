@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.animation.Animation
@@ -17,21 +16,16 @@ import android.view.animation.RotateAnimation
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.lifecycle.lifecycleScope
-import com.alibaba.fastjson.JSONObject
 import com.bumptech.glide.Glide
 import com.ppx.music.MusicApplication
-import com.ppx.music.NetRequest
 import com.ppx.music.R
 import com.ppx.music.databinding.FragmentPlayerBinding
-import com.ppx.music.http.NetworkService
 import com.ppx.music.model.PlaySongUrlEvent
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.player.MusicController
 import com.ppx.music.player.MusicPlayerService
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.TimeTransUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -42,7 +36,7 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     OnSeekBarChangeListener {
-
+    private val TAG = "PlayerActivity"
     private var clickSongDetailInfo: SongDetailInfo? = SongDetailInfo()
     private val musicController = MusicController.instance
     private lateinit var stylusRotate: RotateAnimation
@@ -59,8 +53,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
 
     override fun initView() {
         execAnim()
-        handlerUpdateUi()
-
+        handlerUpdateTimeUI()
     }
 
     override fun initListener() {
@@ -80,15 +73,17 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
 
         clickSongDetailInfo =
             intent.getParcelableExtra("clickSongDetailInfo")
-        LogUtils.d("initData clickSongDetailInfo = $clickSongDetailInfo")
+        LogUtils.d(TAG, "initData clickSongDetailInfo = $clickSongDetailInfo")
 
         if (clickSongDetailInfo != null) {
             val clickSongId = clickSongDetailInfo?.songId
             if (clickSongId != null) {
-                getSongUrlById(clickSongId)
+                lifecycleScope.launch {
+                    musicController.getSongUrlById(clickSongId)
+                }
             }
 
-            initPlayerData(clickSongDetailInfo!!)
+            initSongData(clickSongDetailInfo!!)
         }
     }
 
@@ -103,27 +98,30 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.iv_play_song -> {
-                LogUtils.d("onclick iv_play_song . playingStatus = ${musicController.isPlaying()}")
+                LogUtils.d(
+                    TAG,
+                    "onclick iv_play_song . playingStatus = ${musicController.isPlaying()}"
+                )
                 clickBtnPlayPause()
             }
 
             R.id.iv_loop_mode -> {
-                LogUtils.d("onclick iv_loop_mode playMode  = $playMode")
+                LogUtils.d(TAG, "onclick iv_loop_mode playMode  = $playMode")
                 clickBtnMode()
             }
 
             R.id.iv_pre_song -> {
-                LogUtils.d("onclick iv_pre_song")
+                LogUtils.d(TAG, "onclick iv_pre_song")
                 musicController.playPreSong()
             }
 
             R.id.iv_next_song -> {
-                LogUtils.d("onclick iv_next_song")
+                LogUtils.d(TAG, "onclick iv_next_song")
                 musicController.playNextSong()
             }
 
             R.id.iv_playing_song_list -> {
-                LogUtils.d("onclick iv_playing_song_list}")
+                LogUtils.d(TAG, "onclick iv_playing_song_list}")
             }
 
             R.id.iv_down_white -> {
@@ -181,14 +179,14 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
                 binding.ivLoopMode.setImageResource(R.mipmap.ic_playmode_sequence)
             }
         }
-        LogUtils.d("after click iv_loop_mode playMode = $playMode")
+        LogUtils.d(TAG, "after click iv_loop_mode playMode = $playMode")
         musicController.setPlayMode(playMode)
     }
 
     /**
      * 更新当前播放时间、和progress进度显示
      */
-    private fun handlerUpdateUi() {
+    private fun handlerUpdateTimeUI() {
         handler = object : Handler(Looper.getMainLooper()) {
             override fun handleMessage(msg: Message) {
                 super.handleMessage(msg)
@@ -210,33 +208,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
         handler.sendMessage(message)
     }
 
-    private fun getSongUrlById(id: String) {
-        LogUtils.d("playMusic PlayerActivity getSongUrlById id = $id")
-
-        lifecycleScope.launch {
-            val networkService = NetworkService.createService()
-            val newsEntity = networkService.getNewsService(id)
-            Log.d("TAG", "getSongUrlById: $newsEntity")
-
-
-            val jsonObjectStr = JSONObject.parseObject(newsEntity.toString())
-            val dataStr = jsonObjectStr["data"].toString()
-            val dataArray = JSONObject.parseArray(dataStr)
-            if (dataArray.size > 0) {
-                val data = dataArray[0].toString()
-                val dataObj = JSONObject.parseObject(data)
-                val url = dataObj["url"].toString()
-                LogUtils.d("66666666666666666666   playMusic NetRequest getSongUrlById url = $url")
-
-                EventBus.getDefault().post(PlaySongUrlEvent(url))
-            } else {
-                LogUtils.d("getSongUrlById dataArray.size = 0")
-            }
-        }
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  哈哈    放鞭炮！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-    }
-
-    private fun initPlayerData(songData: SongDetailInfo) {
+    private fun initSongData(songData: SongDetailInfo) {
         Glide.with(this).load(songData.picUrl).into(binding.spiMusicRotate)
 
         binding.tvSongName.text = songData.songName
@@ -248,31 +220,18 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
         }
         binding.tvSingerName.text = singerSb.dropLast(1)
 
+        currSongMillsTime = 0
+        binding.sbSeekbar.progress = 0
         binding.sbSeekbar.max = (songData.songTime / 1000).toInt() //歌曲有多少秒 max就是多少  方便计算
-        LogUtils.d("seekbar max = ${songData.songTime / 1000}")
+        LogUtils.d(TAG, "seekbar max = ${songData.songTime / 1000}")
         val timeStr = TimeTransUtils.long2Minutes(songData.songTime)
+        binding.tvCurrTime.text = "00:00"
         binding.tvTotalTime.text = timeStr
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onPlaySongUrlEvent(event: PlaySongUrlEvent) {
-        LogUtils.d("playMusic onPlaySongUrlEvent url = ${event.url}")
-        if (!TextUtils.isEmpty(event.url)) {
-            //使用豆包提供的原生的mediaPlayer也可以正常播放...
-            val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
-            intent.putExtra("url", event.url)
-            intent.setAction("PLAY")
-            startService(intent)
-        }
-
-        //歌曲播放完成，进度置零
-        currSongMillsTime = 0
-        binding.sbSeekbar.progress = 0
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     fun onSongDetailInfo(songDetailInfo: SongDetailInfo) {
-        initPlayerData(songDetailInfo)
+        initSongData(songDetailInfo)
     }
 
     /**
