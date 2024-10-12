@@ -2,6 +2,7 @@ package com.ppx.music.view.recommend
 
 import android.content.Intent
 import android.util.Log
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONObject
@@ -61,6 +62,14 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
             val intent = Intent(requireActivity(), PlayerActivity::class.java)
             intent.putExtra("clickSongDetailInfo",clickSongDetailInfo)
             startActivity(intent)
+        }
+
+        binding.ivBack.setOnClickListener {
+            val fragmentManager = activity?.supportFragmentManager
+            val transaction = fragmentManager?.beginTransaction()
+            fragmentManager?.popBackStack()
+//            transaction?.replace(R.id.framelayout,RecommendFragment())
+            transaction?.commit()
         }
     }
 
@@ -153,7 +162,6 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
                 val alName = alObj["name"].toString()
                 //是否是会员歌曲
                 val fee = jsonObject["fee"].toString()
-//                Log.d(TAG, "analysisData: ")
                 val songVipStatus = initSongVipStatus(fee)
                 //歌曲时间 毫秒
                 val songTime = jsonObject["dt"].toString().toLong()
