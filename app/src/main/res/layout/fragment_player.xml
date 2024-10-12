@@ -65,9 +65,18 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="80dp"
-            android:hint="I'm So Sorry"
+            android:hint="11"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/spi_music_rotate" />
+
+        <TextView
+            android:id="@+id/tv_vip_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:hint="VIP"
+            app:layout_constraintLeft_toRightOf="@id/tv_song_name"
+            app:layout_constraintTop_toTopOf="@id/tv_song_name" />
 
         <TextView
             android:id="@+id/tv_singer_name"
@@ -107,10 +116,10 @@
             android:layout_marginEnd="20dp"
             android:max="100"
             android:progress="0"
+            android:visibility="invisible"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_singer_name"
-            android:visibility="invisible"/>
+            app:layout_constraintTop_toBottomOf="@id/tv_singer_name" />
 
         <SeekBar
             android:id="@+id/sb_seekbar"

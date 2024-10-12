@@ -22,6 +22,7 @@ import com.ppx.music.R
 import com.ppx.music.databinding.FragmentPlayerBinding
 import com.ppx.music.model.PlaySongUrlEvent
 import com.ppx.music.model.SongDetailInfo
+import com.ppx.music.model.SongVipStatus
 import com.ppx.music.player.MusicController
 import com.ppx.music.player.MusicPlayerService
 import com.ppx.music.utils.LogUtils
@@ -227,6 +228,8 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
         val timeStr = TimeTransUtils.long2Minutes(songData.songTime)
         binding.tvCurrTime.text = "00:00"
         binding.tvTotalTime.text = timeStr
+        binding.tvVipStatus.visibility =
+            if (songData.songVipStatus == SongVipStatus.FREE || songData.songVipStatus== SongVipStatus.ALL_CAN_PLAY) View.GONE else View.VISIBLE
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -10,5 +10,6 @@
     <string name="test">测试数据</string>
     <string name="vip">VIP</string>
     <string name="renewal">续费</string>
+    <string name="drawerlayout_mine_info">侧滑个人信息</string>
 
 </resources>

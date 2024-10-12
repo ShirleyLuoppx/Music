@@ -2,6 +2,7 @@ package com.ppx.music.adapter
 
 import android.content.Context
 import android.net.Uri
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,6 +11,7 @@ import com.chad.library.adapter4.BaseQuickAdapter
 import com.chad.library.adapter4.viewholder.QuickViewHolder
 import com.ppx.music.R
 import com.ppx.music.model.SongDetailInfo
+import com.ppx.music.model.SongVipStatus
 import com.ppx.music.utils.LogUtils
 
 /**
@@ -25,8 +27,10 @@ class DailyRecommendAdapter : BaseQuickAdapter<SongDetailInfo, QuickViewHolder>(
         val tvSingerName : TextView = holder.getView(R.id.tv_singer_name)
         val tvAlbumName : TextView = holder.getView(R.id.tv_album_name)
         val ivAlbumPic : ImageView = holder.getView(R.id.iv_album_pic)
+        val tvIsVipSong:TextView = holder.getView(R.id.tv_is_vip_song)
         tvSongName.text = item?.songName
         tvAlbumName.text = item?.songAlbum
+        tvIsVipSong.visibility = if(item?.songVipStatus == SongVipStatus.FREE || item?.songVipStatus == SongVipStatus.ALL_CAN_PLAY) View.GONE else View.VISIBLE
         Glide.with(context).load(item?.picUrl).override(50,50).into(ivAlbumPic)
 
 //        ivAlbumPic.setImageURI(Uri.parse(item?.picUrl))

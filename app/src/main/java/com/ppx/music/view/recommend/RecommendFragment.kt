@@ -1,47 +1,35 @@
 package com.ppx.music.view.recommend
 
-import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import com.ppx.music.R
 import com.ppx.music.databinding.FragmentRecommendBinding
-
+import com.ppx.music.view.BaseFragment
 
 /**
  * 音乐首页：
  *
  * 包含 ：每日30首，推荐歌单，猜你喜欢，排行榜等列表
  */
-class RecommendFragment : Fragment(), OnClickListener {
+class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListener {
 
-    private lateinit var binding: FragmentRecommendBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_recommend, container, false)
-        return binding.root
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_recommend
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initData()
-        initListener()
+    override fun initView() {
+        setGreetingWords()
     }
 
-    private fun initData() {
-
+    override fun initData() {
     }
 
-    private fun initListener() {
+    override fun initListener() {
         binding.cvDailyRecommend.setOnClickListener(this)
+    }
+
+    override fun onDestroyFragment() {
     }
 
     override fun onClick(p0: View?) {
@@ -62,5 +50,20 @@ class RecommendFragment : Fragment(), OnClickListener {
             ?.commit()
     }
 
-
+    private fun setGreetingWords() {
+        //获取当前的时间
+        val currentTime = System.currentTimeMillis()
+        //将时间戳转换为日期格式
+        val date = java.util.Date(currentTime)
+        //获取小时
+        val hour = date.hours
+        //根据小时设置问候语
+        if (hour in 6..12) {
+            binding.tvGreeting.text = "早上好"
+        } else if (hour in 13..18) {
+            binding.tvGreeting.text = "下午好"
+        } else {
+            binding.tvGreeting.text = "晚上好"
+        }
+    }
 }

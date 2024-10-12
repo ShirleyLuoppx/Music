@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import org.greenrobot.eventbus.EventBus
 
 /**
  *
@@ -20,10 +19,10 @@ abstract class BaseFragment<V:ViewDataBinding> : Fragment() {
     lateinit var binding: V
     private var layoutId:Int = 0
 
-    abstract fun initView()
-    abstract fun initListener()
-    abstract fun initData()
     abstract fun getLayoutId(): Int
+    abstract fun initView()
+    abstract fun initData()
+    abstract fun initListener()
     abstract fun onDestroyFragment()
 
     override fun onCreateView(

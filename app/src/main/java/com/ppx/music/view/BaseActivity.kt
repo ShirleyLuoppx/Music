@@ -59,7 +59,7 @@ abstract class BaseActivity<V : ViewDataBinding> : AppCompatActivity() {
             )
         }*/
 
-        //Android 6以及以上都可以用这种方式，去设置状态栏的字体颜色
+        //Android 6以及以上都可以用这种方式，去设置状态栏的字体颜色，更推荐这种方式，使用更简单，兼容性更好，安全性也更高
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val controller = ViewCompat.getWindowInsetsController(window.decorView)
             controller?.isAppearanceLightStatusBars = isBlack  //true为黑色字体，false为白色字体
