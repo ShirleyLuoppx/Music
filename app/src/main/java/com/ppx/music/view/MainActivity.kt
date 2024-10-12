@@ -1,7 +1,9 @@
 package com.ppx.music.view
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentTransaction
 import com.ppx.music.R
@@ -20,6 +22,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private lateinit var tvFind: TextView
     private lateinit var tvMine: TextView
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun initView() {
         tvRecommend = binding.include.tvRecommend
         tvFind = binding.include.tvFind
@@ -70,7 +73,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
         when (index) {
             0 -> {
-
                 transaction.replace(R.id.framelayout, recommendFragment)
                 LogUtils.d("recommendFragment index =0 .....tvRecommend = $tvRecommend")
                 tvRecommend.setTextColor(resources.getColor(R.color.red))
@@ -102,5 +104,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         transaction.hide(findFragment)
         transaction.hide(mineFragment)
     }
-
 }
+
+

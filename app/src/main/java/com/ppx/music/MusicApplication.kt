@@ -1,6 +1,5 @@
 package com.ppx.music
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import com.ppx.music.utils.LogUtils
