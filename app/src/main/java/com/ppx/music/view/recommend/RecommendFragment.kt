@@ -83,7 +83,6 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
         lifecycleScope.launch {
             val playListData = musicController.getDailyRecommendPlayList()
             LogUtils.d(TAG, "getDailyRecommendPlayList playListData = ${playListData[0].name}")
-//            dailyRecommendPlayListAdapter.
             dailyRecommendPlayListAdapter.addAll(playListData)
         }
     }

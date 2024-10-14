@@ -3,11 +3,9 @@ package com.ppx.music.view
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.text.TextUtils
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.animation.Animation
@@ -17,16 +15,13 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.ppx.music.MusicApplication
 import com.ppx.music.R
 import com.ppx.music.databinding.FragmentPlayerBinding
-import com.ppx.music.model.PlaySongUrlEvent
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
 import com.ppx.music.player.MusicController
-import com.ppx.music.player.MusicPlayerService
 import com.ppx.music.utils.LogUtils
-import com.ppx.music.utils.TimeTransUtils
+import com.ppx.music.utils.NumberTransUtils
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -196,7 +191,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
 //                        LogUtils.d("handleMessage currSongMillsTime = $currSongMillsTime")
                         currSongMillsTime += 1000
                         binding.tvCurrTime.text =
-                            TimeTransUtils.long2Minutes(currSongMillsTime.toLong())
+                            NumberTransUtils.long2Minutes(currSongMillsTime.toLong())
                         binding.sbSeekbar.progress = currSongMillsTime / 1000
                         handler.sendEmptyMessageDelayed(1001, 1000)
                     }
@@ -225,7 +220,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
         binding.sbSeekbar.progress = 0
         binding.sbSeekbar.max = (songData.songTime / 1000).toInt() //歌曲有多少秒 max就是多少  方便计算
         LogUtils.d(TAG, "seekbar max = ${songData.songTime / 1000}")
-        val timeStr = TimeTransUtils.long2Minutes(songData.songTime)
+        val timeStr = NumberTransUtils.long2Minutes(songData.songTime)
         binding.tvCurrTime.text = "00:00"
         binding.tvTotalTime.text = timeStr
         binding.tvVipStatus.visibility =

@@ -21,16 +21,15 @@
         <!--        每日推荐-->
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_daily_recommend"
-            android:layout_width="100dp"
+            android:layout_width="135dp"
             android:layout_height="150dp"
             android:layout_marginTop="10dp"
-            app:cardCornerRadius="20dp"
+            app:cardCornerRadius="6dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_greeting">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-
                 android:layout_height="match_parent">
 
                 <TextView

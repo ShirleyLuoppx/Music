@@ -227,7 +227,8 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         return songUrl
     }
 
-    suspend fun getDailyRecommendPlayList():  ArrayList<PlayListInfo> {
+    //获取每日推荐歌单列表
+    suspend fun getDailyRecommendPlayList(): ArrayList<PlayListInfo> {
         val playListStr = networkService.getDailyRecommendPlaylist().toString()
         Log.d(TAG, "getDailyRecommendPlayList: $playListStr")
 
