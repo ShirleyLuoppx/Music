@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.ppx.music.R
 
 /**
  *
@@ -48,5 +49,12 @@ abstract class BaseFragment<V:ViewDataBinding> : Fragment() {
         binding.unbind()
 
         onDestroyFragment()
+    }
+
+    fun replaceFragment(fragment: Fragment) {
+        activity?.supportFragmentManager?.beginTransaction()
+            ?.replace(R.id.framelayout, fragment)
+            ?.addToBackStack(null)
+            ?.commit()
     }
 }

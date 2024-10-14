@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONObject
 import com.ppx.music.MusicApplication
 import com.ppx.music.common.Constants
 import com.ppx.music.http.NetworkService
+import com.ppx.music.model.PlayListCreatorInfo
 import com.ppx.music.model.PlayListInfo
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.utils.LogUtils
@@ -41,6 +42,7 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
     //当前播放模式：0列表循环、1单曲循环、2随机播放
     private var playMode = 0
     private val networkService = NetworkService.createService()
+    private var playListInfo: PlayListInfo? = null
 
     companion object {
         val instance: MusicController by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -250,12 +252,21 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
                 playListInfoList.clear()
                 for (playList in dailyRecommendPlayListArray) {
                     val jsonObj = JSONObject.parseObject(playList.toString())
+                    //歌单信息
                     val playListId = jsonObj["id"].toString().toFloat()
                     val playListName = jsonObj["name"].toString()
                     val playListPicUrl = jsonObj["picUrl"].toString()
                     val playListPlayCount = jsonObj["playcount"].toString()
+                    //歌单创建者信息
+                    val playListCreatorJO = JSONObject.parseObject(jsonObj["creator"].toString())
+                    val playListCreatorName = playListCreatorJO["nickname"].toString()
+                    val playListCreatorAvatar = playListCreatorJO["avatarUrl"].toString()
+
                     val playListInfo =
-                        PlayListInfo(playListId, playListName, playListPicUrl, playListPlayCount)
+                        PlayListInfo(
+                            playListId, playListName, playListPicUrl, playListPlayCount,
+                            PlayListCreatorInfo(playListCreatorName, playListCreatorAvatar)
+                        )
                     playListInfoList.add(playListInfo)
                 }
                 LogUtils.d(
@@ -279,6 +290,14 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
             intent.setAction("PLAY")
             MusicApplication.context.startService(intent)
         }
+    }
+
+    fun setPlayListInfo(data: PlayListInfo) {
+        playListInfo = data
+    }
+
+    fun getPlayListInfo(): PlayListInfo? {
+        return playListInfo
     }
 
 }

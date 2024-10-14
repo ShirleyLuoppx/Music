@@ -10,6 +10,7 @@ import com.chad.library.adapter4.viewholder.QuickViewHolder
 import com.ppx.music.R
 import com.ppx.music.model.PlayListInfo
 import com.ppx.music.utils.NumberTransUtils
+import java.math.BigDecimal
 
 /**
  *
@@ -21,7 +22,9 @@ class DailyRecommendPlayListAdapter : BaseQuickAdapter<PlayListInfo, QuickViewHo
     override fun onBindViewHolder(holder: QuickViewHolder, position: Int, item: PlayListInfo?) {
         Log.d("TAG", "onBindViewHolder: ${item?.playcount.toString()}")
         val tvPlayCount: TextView = holder.getView(R.id.tv_play_count)
-        tvPlayCount.text =  NumberTransUtils.formatNumber(item?.playcount.toString())
+        val scienceStrPlayCount = item?.playcount.toString()
+        val playCountStr = BigDecimal(scienceStrPlayCount).toPlainString()
+        tvPlayCount.text =  NumberTransUtils.formatNumber(playCountStr)
         val tvPlayListName: TextView = holder.getView(R.id.tv_playlist_name)
         tvPlayListName.text = item?.name.toString()
 //        holder.setText(R.id.tv_play_count, item?.playcount.toString())   //TODO:不明白为什么这种方式设置不了数据，看里面的实现都是一样的哇？？？

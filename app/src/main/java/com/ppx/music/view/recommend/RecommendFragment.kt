@@ -3,6 +3,7 @@ package com.ppx.music.view.recommend
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ppx.music.R
@@ -39,6 +40,16 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
 
     override fun initListener() {
         binding.cvDailyRecommend.setOnClickListener(this)
+        dailyRecommendPlayListAdapter.setOnItemClickListener { adapter, view, position ->
+
+            val clickPlayListInfo = adapter.getItem(position)
+            if (clickPlayListInfo != null) {
+                musicController.setPlayListInfo(clickPlayListInfo)
+            } else {
+                LogUtils.d(TAG, "initListener: clickPlayListInfo is null")
+            }
+            replaceFragment(DailyRecommendPlayListFragment())
+        }
     }
 
     override fun onDestroyFragment() {
@@ -47,19 +58,10 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.cv_daily_recommend -> {
-                clickDailyRecommend()
+                replaceFragment(DailyRecommendSongFragment())
                 return
             }
         }
-    }
-
-    private fun clickDailyRecommend() {
-        //转到DailyRecommendFragment
-        val dailyRecommendFragment = DailyRecommendFragment()
-        activity?.supportFragmentManager?.beginTransaction()
-            ?.replace(R.id.framelayout, dailyRecommendFragment)
-            ?.addToBackStack(null)
-            ?.commit()
     }
 
     private fun setGreetingWords() {
@@ -83,7 +85,9 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
         lifecycleScope.launch {
             val playListData = musicController.getDailyRecommendPlayList()
             LogUtils.d(TAG, "getDailyRecommendPlayList playListData = ${playListData[0].name}")
-            dailyRecommendPlayListAdapter.addAll(playListData)
+            if (dailyRecommendPlayListAdapter.getItem(0) == null) {
+                dailyRecommendPlayListAdapter.addAll(playListData)
+            }
         }
     }
 

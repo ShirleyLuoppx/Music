@@ -15,10 +15,9 @@ object NumberTransUtils {
         return when {
             num < 10000 -> number
             num < 100000000 -> "${num / 10000}万"
-            else -> "${num / 100000000}亿"
+            else -> "${num / 100000000 }亿"
         }
     }
-
 
     /**
      * long类型的时间转换为分钟数

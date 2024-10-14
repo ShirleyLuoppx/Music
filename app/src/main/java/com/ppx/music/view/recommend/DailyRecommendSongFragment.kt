@@ -27,9 +27,9 @@ import kotlin.random.Random
  *
  * @Author Shirley
  * @Date：2024/7/22
- * @Desc：每日推荐
+ * @Desc：每日推荐歌曲列表
  */
-class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
+class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
 //    private val dailyRecommendViewModel by viewModel<DailyRecommendViewModel>()
     private val dailyRecommendViewModel  = DailyRecommendViewModel()
@@ -108,7 +108,7 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
                             dailyRecommendAdapter.addAll(data)
 //                            dailyRecommendAdapter.notifyDataSetChanged()
 
-                            Glide.with(this@DailyRecommendFragment)
+                            Glide.with(this@DailyRecommendSongFragment)
                                .load(data[Random.nextInt(0, data.size)].picUrl)
                                .into(binding.ivTopBg)
                         }
