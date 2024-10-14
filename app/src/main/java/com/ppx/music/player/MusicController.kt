@@ -5,9 +5,12 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.text.TextUtils
+import android.util.Log
 import com.alibaba.fastjson.JSONObject
 import com.ppx.music.MusicApplication
+import com.ppx.music.common.Constants
 import com.ppx.music.http.NetworkService
+import com.ppx.music.model.PlayListInfo
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.utils.LogUtils
 import kotlinx.coroutines.Dispatchers
@@ -28,12 +31,16 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
 
     private val TAG = "MusicController"
     private var mediaPlayer: MediaPlayer? = null
+
     //当前播放列表数据
     private var musicDataList: ArrayList<SongDetailInfo> = ArrayList()
+
     //当前播放的歌曲索引
     private var currentSongIndex = -1
+
     //当前播放模式：0列表循环、1单曲循环、2随机播放
     private var playMode = 0
+    private val networkService = NetworkService.createService()
 
     companion object {
         val instance: MusicController by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -115,7 +122,7 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         return currentSongIndex
     }
 
-    fun playNextSong():Int {
+    fun playNextSong(): Int {
         if (playMode == 0 || playMode == 1) {
             if (currentSongIndex < musicDataList.size - 1) {
                 currentSongIndex++
@@ -201,7 +208,6 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         var songUrl = ""
         LogUtils.d(TAG, "getSongUrlById id = $id")
 
-        val networkService = NetworkService.createService()
         val newsEntity = networkService.getNewsService(id)
 
         val jsonObjectStr = JSONObject.parseObject(newsEntity.toString())
@@ -219,6 +225,49 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
             LogUtils.d(TAG, "getSongUrlById dataArray.size = 0")
         }
         return songUrl
+    }
+
+    suspend fun getDailyRecommendPlayList():  ArrayList<PlayListInfo> {
+        val playListStr = networkService.getDailyRecommendPlaylist().toString()
+        Log.d(TAG, "getDailyRecommendPlayList: $playListStr")
+
+        return analysisPlayList(playListStr)
+    }
+
+    //解析每日推荐歌单数据
+    private fun analysisPlayList(playListStr: String): ArrayList<PlayListInfo> {
+        LogUtils.d(TAG, "analysisPlayList playListStr = $playListStr")
+
+        val playListInfoList = ArrayList<PlayListInfo>()
+
+        if (playListStr.isNotEmpty()) {
+            val jsonObject = JSONObject.parseObject(playListStr)
+            val bodyCode = jsonObject["code"]
+            if (bodyCode == Constants.CODE_SUCCESS) {
+                val recommend = jsonObject["recommend"]
+                val dailyRecommendPlayListArray = JSONObject.parseArray(recommend.toString())
+                playListInfoList.clear()
+                for (playList in dailyRecommendPlayListArray) {
+                    val jsonObj = JSONObject.parseObject(playList.toString())
+                    val playListId = jsonObj["id"].toString().toFloat()
+                    val playListName = jsonObj["name"].toString()
+                    val playListPicUrl = jsonObj["picUrl"].toString()
+                    val playListPlayCount = jsonObj["playcount"].toString()
+                    val playListInfo =
+                        PlayListInfo(playListId, playListName, playListPicUrl, playListPlayCount)
+                    playListInfoList.add(playListInfo)
+                }
+                LogUtils.d(
+                    TAG,
+                    "analysisPlayList success playListInfoList.size = ${playListInfoList.size}"
+                )
+            } else {
+                LogUtils.d(TAG, "analysisPlayList failed code = $bodyCode")
+            }
+        } else {
+            LogUtils.d(TAG, "analysisPlayList playListStr is empty")
+        }
+        return playListInfoList
     }
 
     private fun startService(url: String) {

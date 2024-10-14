@@ -41,9 +41,13 @@ interface NetworkService {
     @GET("get/userids")
     suspend fun getUserIdByNickName(@Query(value = "nicknames") nicknames: String): String
 
+    //获取每日推荐歌曲
     @GET("recommend/songs")
     suspend fun getDailyRecommendSongs(): String
 
+    //获取每日推荐歌单
+    @GET("/recommend/resource")
+    suspend fun getDailyRecommendPlaylist(): JSONObject
 
     /**
      * TODO 通过 Retrofit 创建一个 NetworkService 实例

@@ -1,7 +1,6 @@
 package com.ppx.music.adapter
 
 import android.content.Context
-import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -12,7 +11,6 @@ import com.chad.library.adapter4.viewholder.QuickViewHolder
 import com.ppx.music.R
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
-import com.ppx.music.utils.LogUtils
 
 /**
  *
@@ -20,7 +18,7 @@ import com.ppx.music.utils.LogUtils
  * @Date：2024/7/23
  * @Desc：
  */
-class DailyRecommendAdapter : BaseQuickAdapter<SongDetailInfo, QuickViewHolder>() {
+class DailyRecommendSongAdapter : BaseQuickAdapter<SongDetailInfo, QuickViewHolder>() {
     override fun onBindViewHolder(holder: QuickViewHolder, position: Int, item: SongDetailInfo?) {
         // 设置item数据
         val tvSongName : TextView = holder.getView(R.id.tv_song_name)

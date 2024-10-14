@@ -3,9 +3,15 @@ package com.ppx.music.view.recommend
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.ppx.music.R
+import com.ppx.music.adapter.DailyRecommendPlayListAdapter
 import com.ppx.music.databinding.FragmentRecommendBinding
+import com.ppx.music.player.MusicController
+import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
+import kotlinx.coroutines.launch
 
 /**
  * 音乐首页：
@@ -13,6 +19,10 @@ import com.ppx.music.view.BaseFragment
  * 包含 ：每日30首，推荐歌单，猜你喜欢，排行榜等列表
  */
 class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListener {
+
+    private val TAG = "RecommendFragment"
+    private val musicController = MusicController.instance
+    private val dailyRecommendPlayListAdapter = DailyRecommendPlayListAdapter()
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_recommend
@@ -23,6 +33,8 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
     }
 
     override fun initData() {
+        initRV()
+        getDailyRecommendPlayList()
     }
 
     override fun initListener() {
@@ -65,5 +77,20 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
         } else {
             binding.tvGreeting.text = "晚上好"
         }
+    }
+
+    private fun getDailyRecommendPlayList() {
+        lifecycleScope.launch {
+            val playListData = musicController.getDailyRecommendPlayList()
+            LogUtils.d(TAG, "getDailyRecommendPlayList playListData = ${playListData[0].name}")
+//            dailyRecommendPlayListAdapter.
+            dailyRecommendPlayListAdapter.addAll(playListData)
+        }
+    }
+
+    private fun initRV() {
+        val layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvRecommendPlaylist.layoutManager = layoutManager
+        binding.rvRecommendPlaylist.adapter = dailyRecommendPlayListAdapter
     }
 }

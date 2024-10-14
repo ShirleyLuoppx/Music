@@ -1,13 +1,11 @@
 package com.ppx.music.view.recommend
 
 import android.content.Intent
-import android.util.Log
-import android.view.View
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONObject
+import com.bumptech.glide.Glide
 import com.ppx.music.R
-import com.ppx.music.adapter.DailyRecommendAdapter
+import com.ppx.music.adapter.DailyRecommendSongAdapter
 import com.ppx.music.common.ApiConstants
 import com.ppx.music.common.Constants
 import com.ppx.music.databinding.FragmentDailyRecommendBinding
@@ -23,7 +21,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.random.Random
 
 /**
  *
@@ -36,7 +34,7 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 //    private val dailyRecommendViewModel by viewModel<DailyRecommendViewModel>()
     private val dailyRecommendViewModel  = DailyRecommendViewModel()
     private val songsInfoList = ArrayList<SongDetailInfo>()
-    val dailyRecommendAdapter = DailyRecommendAdapter()
+    val dailyRecommendAdapter = DailyRecommendSongAdapter()
 
     override fun initView() {
 
@@ -109,6 +107,10 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
                         activity?.runOnUiThread {
                             dailyRecommendAdapter.addAll(data)
 //                            dailyRecommendAdapter.notifyDataSetChanged()
+
+                            Glide.with(this@DailyRecommendFragment)
+                               .load(data[Random.nextInt(0, data.size)].picUrl)
+                               .into(binding.ivTopBg)
                         }
                     }
                 }
@@ -177,6 +179,8 @@ class DailyRecommendFragment : BaseFragment<FragmentDailyRecommendBinding>() {
             }
 
             MusicController.instance.setMusicDataList(songsInfoList)
+
+//            Glide
         }
         return songsInfoList
     }
