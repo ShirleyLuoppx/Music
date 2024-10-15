@@ -5,18 +5,16 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.util.Log
-import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.chad.library.adapter4.BaseQuickAdapter
 import com.ppx.music.R
 import com.ppx.music.adapter.DailyRecommendPlayListSongsAdapter
 import com.ppx.music.databinding.FragmentDailyRecommendPlayListBinding
+import com.ppx.music.http.MusicRepository
 import com.ppx.music.model.PlayListInfo
-import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.utils.NumberTransUtils
@@ -40,6 +38,7 @@ class DailyRecommendPlayListFragment : BaseFragment<FragmentDailyRecommendPlayLi
 
     private val TAG = "DailyRecommendPlayListFragment"
     private val musicController = MusicController.instance
+    private val musicRepository = MusicRepository()
     private var playListInfo: PlayListInfo? = null
     private val dailyRecommendPlayListSongAdapter = DailyRecommendPlayListSongsAdapter()
     private val playListId = ""
@@ -76,7 +75,7 @@ class DailyRecommendPlayListFragment : BaseFragment<FragmentDailyRecommendPlayLi
             val playListId = BigDecimal(playListInfo?.id.toString()).toPlainString()
             Log.d(TAG, "initData: id = $playListId")
             lifecycleScope.launch {
-                musicController.getPlayListTrackAll(playListId)
+                musicRepository.getPlayListTrackAll(playListId)
             }
         } else {
             LogUtils.d(TAG, "initData: playListInfo is null")

@@ -1,9 +1,7 @@
 package com.ppx.music.view.recommend
 
-import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ppx.music.R
@@ -11,6 +9,7 @@ import com.ppx.music.adapter.DailyRecommendPlayListAdapter
 import com.ppx.music.adapter.MvAdapter
 import com.ppx.music.databinding.FragmentRecommendBinding
 import com.ppx.music.http.MVRepository
+import com.ppx.music.http.MusicRepository
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
@@ -26,6 +25,7 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
 
     private val TAG = "RecommendFragment"
     private val musicController = MusicController.instance
+    private val musicRepository = MusicRepository()
     private val mvRepository = MVRepository.instance
     private val dailyRecommendPlayListAdapter = DailyRecommendPlayListAdapter()
     private val mvAdapter = MvAdapter()
@@ -103,7 +103,7 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
 
     private fun getDailyRecommendPlayList() {
         lifecycleScope.launch {
-            val playListData = musicController.getDailyRecommendPlayList()
+            val playListData = musicRepository.getDailyRecommendPlayList()
             if (dailyRecommendPlayListAdapter.getItem(0) == null) {
                 dailyRecommendPlayListAdapter.addAll(playListData)
             }

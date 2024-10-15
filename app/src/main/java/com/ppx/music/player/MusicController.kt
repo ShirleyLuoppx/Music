@@ -9,6 +9,7 @@ import android.util.Log
 import com.alibaba.fastjson.JSONObject
 import com.ppx.music.MusicApplication
 import com.ppx.music.common.Constants
+import com.ppx.music.http.MusicRepository
 import com.ppx.music.http.NetworkService
 import com.ppx.music.model.PlayListCreatorInfo
 import com.ppx.music.model.PlayListInfo
@@ -32,17 +33,15 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
 
     private val TAG = "MusicController"
     private var mediaPlayer: MediaPlayer? = null
-
     //当前播放列表数据
     private var musicDataList: ArrayList<SongDetailInfo> = ArrayList()
-
     //当前播放的歌曲索引
     private var currentSongIndex = -1
-
     //当前播放模式：0列表循环、1单曲循环、2随机播放
     private var playMode = 0
     private val networkService = NetworkService.createService()
     private var playListInfo: PlayListInfo? = null
+    private val musicRepository = MusicRepository()
 
     companion object {
         val instance: MusicController by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -201,114 +200,9 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
 
         //使用GlobalScope 会创建一个自定义的协程域，虽然用起来方便，但是可能会导致资源泄漏，因为它不会自动取消，也不会自动回收资源。所以最好还是在activity或者fragment中去使用lifecycleScope，防止泄漏
         GlobalScope.launch(Dispatchers.Main) {
-            getSongUrlById(songId)
+            musicRepository.getSongUrlById(songId)
         }
         EventBus.getDefault().post(songDetailInfo)
-    }
-
-    suspend fun getSongUrlById(id: String): String {
-        var songUrl = ""
-        LogUtils.d(TAG, "getSongUrlById id = $id")
-
-        val newsEntity = networkService.getNewsService(id)
-
-        val jsonObjectStr = JSONObject.parseObject(newsEntity.toString())
-        val dataStr = jsonObjectStr["data"].toString()
-        val dataArray = JSONObject.parseArray(dataStr)
-        if (dataArray.size > 0) {
-            val data = dataArray[0].toString()
-            val dataObj = JSONObject.parseObject(data)
-            val url = dataObj["url"].toString()
-            LogUtils.d(TAG, "getSongUrlById url = $url")
-            songUrl = url
-
-            startService(url)
-        } else {
-            LogUtils.d(TAG, "getSongUrlById dataArray.size = 0")
-        }
-        return songUrl
-    }
-
-    //获取每日推荐歌单列表
-    suspend fun getDailyRecommendPlayList(): ArrayList<PlayListInfo> {
-        val playListStr = networkService.getDailyRecommendPlaylist().toString()
-        Log.d(TAG, "getDailyRecommendPlayList: $playListStr")
-
-        return analysisPlayList(playListStr)
-    }
-
-    //解析每日推荐歌单数据
-    private fun analysisPlayList(playListStr: String): ArrayList<PlayListInfo> {
-        LogUtils.d(TAG, "analysisPlayList playListStr = $playListStr")
-
-        val playListInfoList = ArrayList<PlayListInfo>()
-
-        if (playListStr.isNotEmpty()) {
-            val jsonObject = JSONObject.parseObject(playListStr)
-            val bodyCode = jsonObject["code"]
-            if (bodyCode == Constants.CODE_SUCCESS) {
-                val recommend = jsonObject["recommend"]
-                val dailyRecommendPlayListArray = JSONObject.parseArray(recommend.toString())
-                playListInfoList.clear()
-                for (playList in dailyRecommendPlayListArray) {
-                    val jsonObj = JSONObject.parseObject(playList.toString())
-                    //歌单信息
-                    val playListId = jsonObj["id"].toString().toFloat()
-                    val playListName = jsonObj["name"].toString()
-                    val playListPicUrl = jsonObj["picUrl"].toString()
-                    val playListPlayCount = jsonObj["playcount"].toString()
-                    //歌单创建者信息
-                    val playListCreatorJO = JSONObject.parseObject(jsonObj["creator"].toString())
-                    val playListCreatorName = playListCreatorJO["nickname"].toString()
-                    val playListCreatorAvatar = playListCreatorJO["avatarUrl"].toString()
-
-                    val playListInfo =
-                        PlayListInfo(
-                            playListId, playListName, playListPicUrl, playListPlayCount,
-                            PlayListCreatorInfo(playListCreatorName, playListCreatorAvatar)
-                        )
-                    playListInfoList.add(playListInfo)
-                }
-                LogUtils.d(
-                    TAG,
-                    "analysisPlayList success playListInfoList.size = ${playListInfoList.size}"
-                )
-            } else {
-                LogUtils.d(TAG, "analysisPlayList failed code = $bodyCode")
-            }
-        } else {
-            LogUtils.d(TAG, "analysisPlayList playListStr is empty")
-        }
-        return playListInfoList
-    }
-
-    //获取歌单的所有歌曲
-    suspend fun getPlayListTrackAll(id: String): ArrayList<SongDetailInfo> {
-        val playListTrackAll = networkService.getPlaylistTrackAll(id)
-        Log.d(TAG, "getPlayListTrackAll1: $playListTrackAll")
-
-//        val details = networkService.getPlaylistDetail(id)
-//        Log.d(TAG, "getPlayListTrackAll2: $details")
-
-
-        Log.d(TAG, "getPlayListTrackAll: 1111")
-
-        return arrayListOf()
-    }
-
-    private fun analysisPlayListTrackAll(playListTrackAllStr: String): ArrayList<SongDetailInfo> {
-        return arrayListOf()
-    }
-
-
-    private fun startService(url: String) {
-        if (!TextUtils.isEmpty(url)) {
-            //使用豆包提供的原生的mediaPlayer也可以正常播放...
-            val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
-            intent.putExtra("url", url)
-            intent.setAction("PLAY")
-            MusicApplication.context.startService(intent)
-        }
     }
 
     fun setPlayListInfo(data: PlayListInfo) {

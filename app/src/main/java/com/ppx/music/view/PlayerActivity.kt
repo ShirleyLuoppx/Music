@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.ppx.music.R
 import com.ppx.music.databinding.FragmentPlayerBinding
+import com.ppx.music.http.MusicRepository
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
 import com.ppx.music.player.MusicController
@@ -35,6 +36,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     private val TAG = "PlayerActivity"
     private var clickSongDetailInfo: SongDetailInfo? = SongDetailInfo()
     private val musicController = MusicController.instance
+    private val musicRepository = MusicRepository()
     private lateinit var stylusRotate: RotateAnimation
     private lateinit var rotateAnimator: ObjectAnimator
     private val recordSet = AnimatorSet()
@@ -75,7 +77,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
             val clickSongId = clickSongDetailInfo?.songId
             if (clickSongId != null) {
                 lifecycleScope.launch {
-                    musicController.getSongUrlById(clickSongId)
+                    musicRepository.getSongUrlById(clickSongId)
                 }
             }
 
