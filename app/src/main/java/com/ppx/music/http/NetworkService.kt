@@ -57,6 +57,14 @@ interface NetworkService {
     @GET("/playlist/detail")
     suspend fun getPlaylistDetail(@Query(value = "id") id: String): JSONObject
 
+    //获取mv的id
+    @GET("/top/mv")
+    suspend fun getTopMV(): JSONObject
+
+    //通过mv的id获取到mv的播放路径
+    @POST("/mv/url")
+    suspend fun getMVUrlById(@Query(value = "id") id: String): JSONObject
+
 
     companion object {
         fun createService(): NetworkService {

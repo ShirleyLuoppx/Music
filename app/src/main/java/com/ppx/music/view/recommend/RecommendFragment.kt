@@ -8,11 +8,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ppx.music.R
 import com.ppx.music.adapter.DailyRecommendPlayListAdapter
+import com.ppx.music.adapter.MvAdapter
 import com.ppx.music.databinding.FragmentRecommendBinding
+import com.ppx.music.http.MVRepository
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 /**
  * 音乐首页：
@@ -23,7 +26,9 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
 
     private val TAG = "RecommendFragment"
     private val musicController = MusicController.instance
+    private val mvRepository = MVRepository.instance
     private val dailyRecommendPlayListAdapter = DailyRecommendPlayListAdapter()
+    private val mvAdapter = MvAdapter()
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_recommend
@@ -36,6 +41,7 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
     override fun initData() {
         initRV()
         getDailyRecommendPlayList()
+        getTopMV()
     }
 
     override fun initListener() {
@@ -49,6 +55,20 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
                 LogUtils.d(TAG, "initListener: clickPlayListInfo is null")
             }
             replaceFragment(DailyRecommendPlayListFragment())
+        }
+
+        mvAdapter.setOnItemClickListener { adapter, view, position ->
+            val mvInfo = adapter.getItem(position)
+            if (mvInfo != null) {
+                val mvId = mvInfo.id
+                LogUtils.d(TAG, "initListener: mvId: $mvId")
+                val normalId = BigDecimal(mvId).toPlainString()
+                LogUtils.d(TAG, "initListener: normalId: $normalId")
+
+                lifecycleScope.launch {
+                    mvRepository.getMVUrlById(normalId)
+                }
+            }
         }
     }
 
@@ -90,9 +110,22 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
         }
     }
 
+    private fun getTopMV() {
+        lifecycleScope.launch {
+            val mvList = mvRepository.getTopMv()
+            if (mvAdapter.getItem(0) == null) {
+                mvAdapter.addAll(mvList)
+            }
+        }
+    }
+
     private fun initRV() {
         val layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false)
         binding.rvRecommendPlaylist.layoutManager = layoutManager
         binding.rvRecommendPlaylist.adapter = dailyRecommendPlayListAdapter
+
+        val layoutManager1 = LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvMvList.layoutManager = layoutManager1
+        binding.rvMvList.adapter = mvAdapter
     }
 }

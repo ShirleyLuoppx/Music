@@ -12,6 +12,7 @@
     <string name="renewal">续费</string>
     <string name="drawerlayout_mine_info">侧滑个人信息</string>
     <string name="recommend_playlist">推荐歌单 > </string>
+    <string name="mv_list">推荐视频 > </string>
     <string name="playlist">歌单</string>
 
 </resources>

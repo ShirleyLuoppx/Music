@@ -99,10 +99,32 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_recommend_playlist"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="150dp"
             android:orientation="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_recommend_playlist"
+            tools:listitem="@layout/item_playlist" />
+
+        <TextView
+            android:id="@+id/tv_mv_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:padding="15dp"
+            android:paddingStart="0dp"
+            android:text="@string/mv_list"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_recommend_playlist" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_mv_list"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_mv_list"
             tools:listitem="@layout/item_playlist" />
 
 
