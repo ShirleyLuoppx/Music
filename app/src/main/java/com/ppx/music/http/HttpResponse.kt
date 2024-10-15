@@ -7,5 +7,5 @@ package com.ppx.music.http
  * @Desc：
  */
 data class HttpResponse<out T> (
-    val code: Int, val msg: String, val data: T
+    val code: Int,  val data: T
 )

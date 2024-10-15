@@ -282,6 +282,25 @@ class MusicController : MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListe
         return playListInfoList
     }
 
+    //获取歌单的所有歌曲
+    suspend fun getPlayListTrackAll(id: String): ArrayList<SongDetailInfo> {
+        val playListTrackAll = networkService.getPlaylistTrackAll(id)
+        Log.d(TAG, "getPlayListTrackAll1: $playListTrackAll")
+
+//        val details = networkService.getPlaylistDetail(id)
+//        Log.d(TAG, "getPlayListTrackAll2: $details")
+
+
+        Log.d(TAG, "getPlayListTrackAll: 1111")
+
+        return arrayListOf()
+    }
+
+    private fun analysisPlayListTrackAll(playListTrackAllStr: String): ArrayList<SongDetailInfo> {
+        return arrayListOf()
+    }
+
+
     private fun startService(url: String) {
         if (!TextUtils.isEmpty(url)) {
             //使用豆包提供的原生的mediaPlayer也可以正常播放...

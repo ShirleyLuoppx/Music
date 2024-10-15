@@ -14,15 +14,13 @@ import java.util.concurrent.TimeUnit
  */
 object NetworkModule {
 
-    /**
-     * TODO 创建 Retrofit 实例
-     *  //http://119.91.147.152:3000/song/url?id=2602622157
-     */
+    private const val BASE_URL = "http://119.91.147.152:3000"
+
     fun createRetrofit(okHttpClient: OkHttpClient) : Retrofit{
         // 返回一个 retrofit 实例
         return Retrofit.Builder()
             .client(okHttpClient) // 让 retrofit 使用 okhttp
-            .baseUrl("http://119.91.147.152:3000/") // api 地址
+            .baseUrl(BASE_URL) // api 地址
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))// 使用 gson 解析 json
             .build()
     }

@@ -13,49 +13,55 @@ import retrofit2.http.Query
  */
 interface NetworkService {
 
-    @POST("captcha/sent")
+    @POST("/captcha/sent")
     suspend fun sendVerifyCode(
         @Query(value = "phone") phone: String,
         @Query(value = "timestamp") timestamp: String
     ): String
 
-    @GET("song/url")
+    @GET("/song/url")
     suspend fun getNewsService(@Query(value = "id") id: String): JSONObject
 
-    @POST("captcha/verify")
+    @POST("/captcha/verify")
     suspend fun checkVerifyCode(
         @Query(value = "phone") phone: String,
         @Query(value = "captcha") captcha: String,
         @Query(value = "timestamp") timestamp: String
     ): String
 
-    @POST("cellphone/existence/check")
+    @POST("/cellphone/existence/check")
     suspend fun checkPhone(
         @Query(value = "phone") phone: String,
         @Query(value = "timestamp") timestamp: String
     ): String
 
-    @GET("user/detail")
+    @GET("/user/detail")
     suspend fun getUserDetail(@Query(value = "uid") uid: String): String
 
-    @GET("get/userids")
+    @GET("/get/userids")
     suspend fun getUserIdByNickName(@Query(value = "nicknames") nicknames: String): String
 
     //获取每日推荐歌曲
-    @GET("recommend/songs")
+    @GET("/recommend/songs")
     suspend fun getDailyRecommendSongs(): String
 
     //获取每日推荐歌单
     @GET("/recommend/resource")
     suspend fun getDailyRecommendPlaylist(): JSONObject
 
-    /**
-     * TODO 通过 Retrofit 创建一个 NetworkService 实例
-     */
+    //根据歌单id获取歌曲列表  limit offset
+    @GET("/playlist/track/all")
+    suspend fun getPlaylistTrackAll(@Query(value = "id") id: String): JSONObject
+
+    //获取歌单详情
+    @GET("/playlist/detail")
+    suspend fun getPlaylistDetail(@Query(value = "id") id: String): JSONObject
+
+
     companion object {
         fun createService(): NetworkService {
             return NetworkModule.createRetrofit(NetworkModule.createOkHttpClient())
-                .create(NetworkService::class.java) // TODO 返回一个 NetworkService 的实例
+                .create(NetworkService::class.java)
         }
     }
 }

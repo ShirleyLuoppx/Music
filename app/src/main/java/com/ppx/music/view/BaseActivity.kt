@@ -3,6 +3,7 @@ package com.ppx.music.view
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil

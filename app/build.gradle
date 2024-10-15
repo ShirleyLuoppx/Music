@@ -122,11 +122,10 @@ dependencies {
     //mmkv
     implementation 'com.tencent:mmkv-static:1.2.10'
 
-
-
-
-
-
+    // java 工程
+    //    implementation 'androidx.palette:palette:1.0.0'
+    // kotlin 工程
+    implementation 'androidx.palette:palette-ktx:1.0.0'
 
 
 }

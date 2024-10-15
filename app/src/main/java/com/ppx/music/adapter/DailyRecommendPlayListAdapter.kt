@@ -20,10 +20,10 @@ import java.math.BigDecimal
  */
 class DailyRecommendPlayListAdapter : BaseQuickAdapter<PlayListInfo, QuickViewHolder>() {
     override fun onBindViewHolder(holder: QuickViewHolder, position: Int, item: PlayListInfo?) {
-        Log.d("TAG", "onBindViewHolder: ${item?.playcount.toString()}")
         val tvPlayCount: TextView = holder.getView(R.id.tv_play_count)
         val scienceStrPlayCount = item?.playcount.toString()
         val playCountStr = BigDecimal(scienceStrPlayCount).toPlainString()
+        Log.d("TAG", "onBindViewHolder: $playCountStr")
         tvPlayCount.text =  NumberTransUtils.formatNumber(playCountStr)
         val tvPlayListName: TextView = holder.getView(R.id.tv_playlist_name)
         tvPlayListName.text = item?.name.toString()

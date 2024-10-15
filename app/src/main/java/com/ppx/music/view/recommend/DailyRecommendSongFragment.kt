@@ -11,7 +11,6 @@ import com.ppx.music.common.Constants
 import com.ppx.music.databinding.FragmentDailyRecommendBinding
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
-import com.ppx.music.mvvm.DailyRecommendViewModel
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
@@ -31,8 +30,6 @@ import kotlin.random.Random
  */
 class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
-//    private val dailyRecommendViewModel by viewModel<DailyRecommendViewModel>()
-    private val dailyRecommendViewModel  = DailyRecommendViewModel()
     private val songsInfoList = ArrayList<SongDetailInfo>()
     val dailyRecommendAdapter = DailyRecommendSongAdapter()
 
