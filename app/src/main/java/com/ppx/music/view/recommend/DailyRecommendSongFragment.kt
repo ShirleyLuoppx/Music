@@ -14,7 +14,7 @@ import com.ppx.music.model.SongVipStatus
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
-import com.ppx.music.view.PlayerActivity
+import com.ppx.music.view.MusicPlayerActivity
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -54,7 +54,7 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
 //            transaction?.replace(R.id.framelayout,this)
 //            transaction?.commit()
 
-            val intent = Intent(requireActivity(), PlayerActivity::class.java)
+            val intent = Intent(requireActivity(), MusicPlayerActivity::class.java)
             intent.putExtra("clickSongDetailInfo",clickSongDetailInfo)
             startActivity(intent)
         }

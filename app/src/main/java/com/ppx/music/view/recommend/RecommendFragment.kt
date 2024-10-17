@@ -1,5 +1,6 @@
 package com.ppx.music.view.recommend
 
+import android.content.Intent
 import android.view.View
 import android.view.View.OnClickListener
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +14,7 @@ import com.ppx.music.http.MusicRepository
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
+import com.ppx.music.view.VideoPlayerActivity
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -66,7 +68,11 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
                 LogUtils.d(TAG, "initListener: normalId: $normalId")
 
                 lifecycleScope.launch {
-                    mvRepository.getMVUrlById(normalId)
+                    val playUrl = mvRepository.getMVUrlById(normalId)
+                    LogUtils.d(TAG, "initListener: playUrl: $playUrl")
+                    val intent = Intent(this@RecommendFragment.context,VideoPlayerActivity::class.java)
+                    intent.putExtra("playUrl", playUrl)
+                    startActivity(intent)
                 }
             }
         }
@@ -124,7 +130,8 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
         binding.rvRecommendPlaylist.layoutManager = layoutManager
         binding.rvRecommendPlaylist.adapter = dailyRecommendPlayListAdapter
 
-        val layoutManager1 = LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false)
+        val layoutManager1 =
+            LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false)
         binding.rvMvList.layoutManager = layoutManager1
         binding.rvMvList.adapter = mvAdapter
     }

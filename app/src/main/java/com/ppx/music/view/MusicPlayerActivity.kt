@@ -16,7 +16,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.ppx.music.R
-import com.ppx.music.databinding.FragmentPlayerBinding
+import com.ppx.music.databinding.ActivityMusicPlayerBinding
 import com.ppx.music.http.MusicRepository
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.model.SongVipStatus
@@ -29,9 +29,9 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 /**
- * 播放页
+ * 音频播放页
  */
-class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
+class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickListener,
     OnSeekBarChangeListener {
     private val TAG = "PlayerActivity"
     private var clickSongDetailInfo: SongDetailInfo? = SongDetailInfo()
@@ -86,7 +86,7 @@ class PlayerActivity : BaseActivity<FragmentPlayerBinding>(), OnClickListener,
     }
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_player
+        return R.layout.activity_music_player
     }
 
     override fun destroyView() {

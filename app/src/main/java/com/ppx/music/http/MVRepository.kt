@@ -50,8 +50,8 @@ class MVRepository {
                 val cover = dataStr["cover"]
                 val name = dataStr["name"]
                 val playCount = dataStr["playCount"]
-                LogUtils.d(TAG, "getTopMv: mvId: $mvid")
-                LogUtils.d(TAG, "getTopMv: cover: $cover")
+//                LogUtils.d(TAG, "getTopMv: mvId: $mvid")
+//                LogUtils.d(TAG, "getTopMv: cover: $cover")
                 val mvInfo = MvInfo(mvid.toString(), cover.toString(), name.toString(), playCount.toString().toInt())
                 mvList.add(mvInfo)
             }
@@ -61,9 +61,9 @@ class MVRepository {
         return mvList
     }
 
-    suspend fun getMVUrlById(id: String) {
+    suspend fun getMVUrlById(id: String):String {
         val str = networkService.getMVUrlById(id).toString()
-        analyzeMVUrl(str)
+        return analyzeMVUrl(str)
     }
 
     private fun analyzeMVUrl(dataStr: String): String {

@@ -12,10 +12,10 @@ import com.ppx.music.databinding.FragmentDailyRecommendBinding
 
 abstract class BaseActivity<V : ViewDataBinding> : AppCompatActivity() {
 
+    abstract fun getLayoutId(): Int
     abstract fun initView()
     abstract fun initListener()
     abstract fun initData()
-    abstract fun getLayoutId(): Int
     abstract fun destroyView()
 
     public lateinit var binding: V

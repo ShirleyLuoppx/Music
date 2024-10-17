@@ -60,10 +60,10 @@ dependencies {
 //    kapt "androidx.databinding:databinding-compiler:7.4.2"
 
     //ijkplayer
-//    # required, enough for most devices.
+//    # required, enough for most devices.  这两个基本上已经够用了
     implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
-//    # Other ABIs: optional
+//    # Other ABIs: optional  给其他设备用 如平板
     implementation 'tv.danmaku.ijk.media:ijkplayer-armv5:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-arm64:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'

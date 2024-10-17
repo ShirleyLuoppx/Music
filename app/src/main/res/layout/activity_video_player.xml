@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <VideoView
+            android:id="@+id/vv_videoview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+
+        <com.ppx.music.player.MyIjkVideoView
+            android:id="@+id/ijk_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <SurfaceView
+            android:id="@+id/sf_surfaceview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:src="@mipmap/ic_back_white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
