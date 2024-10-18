@@ -83,7 +83,12 @@ class DailyRecommendPlayListFragment : BaseFragment<FragmentDailyRecommendPlayLi
     }
 
     override fun initListener() {
-
+        binding.ivBack.setOnClickListener {
+            val fragmentManager = activity?.supportFragmentManager
+            val transaction = fragmentManager?.beginTransaction()
+            fragmentManager?.popBackStack()
+            transaction?.commit()
+        }
 
     }
 

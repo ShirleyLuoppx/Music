@@ -60,6 +60,10 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
         }
 
         mvAdapter.setOnItemClickListener { adapter, view, position ->
+
+            //如果音乐在播放的话，需要先暂停音乐播放
+            musicController.pauseMusic()
+
             val mvInfo = adapter.getItem(position)
             if (mvInfo != null) {
                 val mvId = mvInfo.id
@@ -70,7 +74,8 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
                 lifecycleScope.launch {
                     val playUrl = mvRepository.getMVUrlById(normalId)
                     LogUtils.d(TAG, "initListener: playUrl: $playUrl")
-                    val intent = Intent(this@RecommendFragment.context,VideoPlayerActivity::class.java)
+                    val intent =
+                        Intent(this@RecommendFragment.context, VideoPlayerActivity::class.java)
                     intent.putExtra("playUrl", playUrl)
                     startActivity(intent)
                 }

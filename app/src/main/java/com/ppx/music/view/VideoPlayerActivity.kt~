@@ -1,18 +1,23 @@
 package com.ppx.music.view
 
 import android.net.Uri
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.widget.MediaController
 import android.widget.VideoView
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityVideoPlayerBinding
 import com.ppx.music.player.MyIjkVideoView
+import com.ppx.music.player.MyIjkVideoView.VideoPlayerListener
 import com.ppx.music.utils.LogUtils
+import retrofit2.http.Url
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import tv.danmaku.ijk.media.player.IMediaPlayer.OnCompletionListener
 import tv.danmaku.ijk.media.player.IMediaPlayer.OnErrorListener
 import tv.danmaku.ijk.media.player.IMediaPlayer.OnPreparedListener
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
+import kotlin.math.log
 
 /**
  *
