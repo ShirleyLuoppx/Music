@@ -3,10 +3,8 @@ package com.ppx.music.view
 import android.net.Uri
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.widget.VideoView
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityVideoPlayerBinding
-import com.ppx.music.player.MyIjkVideoView
 import com.ppx.music.utils.LogUtils
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import tv.danmaku.ijk.media.player.IMediaPlayer.OnCompletionListener
@@ -25,8 +23,6 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
 
     private val TAG = "VideoPlayerActivity"
     private var videoPath = ""
-    private var mVideoView: VideoView? = null
-    private var ijkVideoView: MyIjkVideoView? = null
     private var surfaceView: SurfaceView? = null
     private val ijkMediaPlayer = IjkMediaPlayer()
 
@@ -35,8 +31,6 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
     }
 
     override fun initView() {
-        mVideoView = binding.vvVideoview
-        ijkVideoView = binding.ijkVideo
         surfaceView = binding.sfSurfaceview
     }
 
@@ -65,7 +59,6 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
 
     override fun onStop() {
         super.onStop()
-        mVideoView?.stopPlayback()
     }
 
     override fun surfaceCreated(p0: SurfaceHolder) {
