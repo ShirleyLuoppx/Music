@@ -30,16 +30,20 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer
 class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceHolder.Callback,
     OnPreparedListener, OnCompletionListener, OnErrorListener, OnClickListener {
 
-    private val TAG = "VideoPlayerActivity"
+
     private var videoPath = ""
     private var surfaceView: SurfaceView? = null
     private val ijkMediaPlayer = IjkMediaPlayer()
     private var screenWidth = 0
     private var screenHeight = 0
 
+    //TODO：ijkMediaPlayer的逻辑  单独拿出来写一个VideoPlayer
+
     override fun getLayoutId(): Int {
         return R.layout.activity_video_player
     }
+
+    private val TAG = "VideoPlayerActivity"
 
     override fun initView() {
         surfaceView = binding.sfSurfaceview
