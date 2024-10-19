@@ -3,6 +3,7 @@ package com.ppx.music.view
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
@@ -13,6 +14,7 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.ppx.music.R
@@ -33,6 +35,7 @@ import org.greenrobot.eventbus.ThreadMode
  */
 class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickListener,
     OnSeekBarChangeListener {
+
     private val TAG = "PlayerActivity"
     private var clickSongDetailInfo: SongDetailInfo? = SongDetailInfo()
     private val musicController = MusicController.instance
@@ -43,6 +46,9 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
 
     //当前播放歌曲的毫秒数
     private var currSongMillsTime = 0
+
+    //发送message id更改播放时间显示和进度条显示
+    private val MSG_UPDATE_TIME = 1001
     private lateinit var handler: Handler
     private lateinit var message: Message
 
@@ -93,6 +99,7 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
         EventBus.getDefault().unregister(this)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.iv_play_song -> {
@@ -111,11 +118,29 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
             R.id.iv_pre_song -> {
                 LogUtils.d(TAG, "onclick iv_pre_song")
                 musicController.playPreSong()
+
+                if (handler.hasMessages(MSG_UPDATE_TIME)) {
+                    handler.removeMessages(MSG_UPDATE_TIME)
+                }
+                handler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000)
+                binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
+
+                recordSet.end()
+                execAnim()
             }
 
             R.id.iv_next_song -> {
                 LogUtils.d(TAG, "onclick iv_next_song")
                 musicController.playNextSong()
+
+                if (handler.hasMessages(MSG_UPDATE_TIME)) {
+                    handler.removeMessages(MSG_UPDATE_TIME)
+                }
+                handler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000)
+                binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
+
+                recordSet.end()
+                execAnim()
             }
 
             R.id.iv_playing_song_list -> {
@@ -148,13 +173,18 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
             binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
             recordSet.pause()
             stylusAnim(0)
-            handler.removeMessages(1001)
+            if(handler.hasMessages(MSG_UPDATE_TIME)){
+                handler.removeMessages(MSG_UPDATE_TIME)
+            }
         } else {
             musicController.resumeMusic()
             binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
             recordSet.resume()
             stylusAnim(1)
-            handler.sendEmptyMessageDelayed(1001, 1000)
+            if(handler.hasMessages(MSG_UPDATE_TIME)){
+                handler.removeMessages(MSG_UPDATE_TIME)
+            }
+            handler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000)
         }
         binding.ivStylus.startAnimation(stylusRotate)
     }
@@ -189,20 +219,20 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
             override fun handleMessage(msg: Message) {
                 super.handleMessage(msg)
                 when (msg.what) {
-                    1001 -> {
+                    MSG_UPDATE_TIME -> {
 //                        LogUtils.d("handleMessage currSongMillsTime = $currSongMillsTime")
                         currSongMillsTime += 1000
                         binding.tvCurrTime.text =
                             NumberTransUtils.long2Minutes(currSongMillsTime.toLong())
                         binding.sbSeekbar.progress = currSongMillsTime / 1000
-                        handler.sendEmptyMessageDelayed(1001, 1000)
+                        handler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000)
                     }
                 }
             }
         }
 
         message = handler.obtainMessage()
-        message.what = 1001
+        message.what = MSG_UPDATE_TIME
         handler.sendMessage(message)
     }
 
@@ -226,7 +256,7 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
         binding.tvCurrTime.text = "00:00"
         binding.tvTotalTime.text = timeStr
         binding.tvVipStatus.visibility =
-            if (songData.songVipStatus == SongVipStatus.FREE || songData.songVipStatus== SongVipStatus.ALL_CAN_PLAY) View.GONE else View.VISIBLE
+            if (songData.songVipStatus == SongVipStatus.FREE || songData.songVipStatus == SongVipStatus.ALL_CAN_PLAY) View.GONE else View.VISIBLE
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -265,7 +295,9 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
         stylusRotate.fillAfter = true //动画执行完后是否停留在执行完的状态
     }
 
-    //执行动画，唱片和唱针的动画
+    /**
+     * 执行动画，唱片和唱针的动画
+     */
     private fun execAnim() {
         // 创建从0度到360度的旋转动画，耗时3秒
         rotateAnimator = ObjectAnimator.ofFloat(binding.spiMusicRotate, "rotation", 0f, 360f)

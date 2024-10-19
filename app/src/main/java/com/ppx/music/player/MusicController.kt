@@ -1,17 +1,11 @@
 package com.ppx.music.player
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.text.TextUtils
-import android.util.Log
-import com.alibaba.fastjson.JSONObject
-import com.ppx.music.MusicApplication
-import com.ppx.music.common.Constants
 import com.ppx.music.http.MusicRepository
 import com.ppx.music.http.NetworkService
-import com.ppx.music.model.PlayListCreatorInfo
 import com.ppx.music.model.PlayListInfo
 import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.utils.LogUtils
