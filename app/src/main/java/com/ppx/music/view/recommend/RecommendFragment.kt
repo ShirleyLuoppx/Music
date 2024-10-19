@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ppx.music.R
 import com.ppx.music.adapter.DailyRecommendPlayListAdapter
 import com.ppx.music.adapter.MvAdapter
+import com.ppx.music.common.Constants
+import com.ppx.music.common.Constants.Companion.MV_INFO
 import com.ppx.music.databinding.FragmentRecommendBinding
 import com.ppx.music.http.MVRepository
 import com.ppx.music.http.MusicRepository
@@ -66,6 +68,8 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
 
             val mvInfo = adapter.getItem(position)
             if (mvInfo != null) {
+                LogUtils.d(TAG, "initListener: mvInfo: $mvInfo")
+
                 val mvId = mvInfo.id
                 LogUtils.d(TAG, "initListener: mvId: $mvId")
                 val normalId = BigDecimal(mvId).toPlainString()
@@ -76,7 +80,8 @@ class RecommendFragment : BaseFragment<FragmentRecommendBinding>(), OnClickListe
                     LogUtils.d(TAG, "initListener: playUrl: $playUrl")
                     val intent =
                         Intent(this@RecommendFragment.context, VideoPlayerActivity::class.java)
-                    intent.putExtra("playUrl", playUrl)
+                    mvInfo.playUrl = playUrl
+                    intent.putExtra(MV_INFO, mvInfo)
                     startActivity(intent)
                 }
             }

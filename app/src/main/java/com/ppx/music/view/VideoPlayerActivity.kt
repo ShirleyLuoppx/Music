@@ -1,7 +1,11 @@
 package com.ppx.music.view
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -9,8 +13,14 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.view.animation.LinearInterpolator
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.ppx.music.R
+import com.ppx.music.common.Constants
 import com.ppx.music.databinding.ActivityVideoPlayerBinding
+import com.ppx.music.model.MvInfo
 import com.ppx.music.player.VideoController
 import com.ppx.music.utils.LogUtils
 
@@ -23,20 +33,17 @@ import com.ppx.music.utils.LogUtils
 class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceHolder.Callback,
     OnClickListener {
 
-
+    private val TAG = "VideoPlayerActivity"
+    private var mvInfo: MvInfo? = null
     private var videoPath = ""
     private var surfaceView: SurfaceView? = null
     private var screenWidth = 0
     private var screenHeight = 0
-
-    //TODO：ijkMediaPlayer的逻辑  单独拿出来写一个VideoPlayer
     private var videoController: VideoController? = null
 
     override fun getLayoutId(): Int {
         return R.layout.activity_video_player
     }
-
-    private val TAG = "VideoPlayerActivity"
 
     override fun initView() {
         surfaceView = binding.sfSurfaceview
@@ -50,10 +57,33 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
         binding.ivPause.setOnClickListener(this)
     }
 
+    @SuppressLint("SetTextI18n")
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun initData() {
-        videoPath = intent.getStringExtra("playUrl").toString()
-        LogUtils.d(TAG, "initData: videoPath: $videoPath")
         videoController = VideoController()
+
+        mvInfo = intent.getParcelableExtra(Constants.MV_INFO) as MvInfo?
+        if (mvInfo != null) {
+            videoPath = mvInfo?.playUrl.toString()
+            LogUtils.d(TAG, "initData: videoPath: $videoPath")
+        } else {
+            LogUtils.d(TAG, "initData: mvInfo is null")
+        }
+
+        Glide.with(this).load(mvInfo?.cover).into(binding.ivMvCover)
+        binding.tvSongSingerName.text = mvInfo?.songName + " - " + mvInfo?.singerName
+        binding.tvSongSingerName.isSelected = true
+        binding.tvSongSingerName.requestFocus()
+
+        binding.tvSongName.text = mvInfo?.songName
+        binding.tvSingerName.text = mvInfo?.singerName
+
+        //TODO:所有的动画都可以单独抽取出来，放到一个动画的工具类里面
+        val rotateAnimator = ObjectAnimator.ofFloat(binding.ivMvCover, "rotation", 0f, 360f)
+        rotateAnimator.duration = 10 * 1000
+        rotateAnimator.repeatCount = ObjectAnimator.INFINITE
+        rotateAnimator.interpolator = LinearInterpolator()
+        rotateAnimator.start()
     }
 
     override fun onClick(view: View?) {
@@ -121,9 +151,17 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
     }
 
     /**
-     * 设置状态栏和导航栏的显示和隐藏
+     * 横屏的时候：隐藏状态栏和导航栏
+     * 竖屏的时候：显示状态栏和导航栏，并设置状态栏和导航栏的背景色为黑色
      */
     private fun setSystemUIStatus(visible: Boolean) {
+        //设置状态栏和导航栏的背景色为黑色
+        if(visible){
+            window.statusBarColor = ContextCompat.getColor(this, R.color.black) // 设置状态栏颜色
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.black) // 设置导航栏颜色
+        }
+
+
         //设置非全屏时候的状态栏和导航栏  显示出来
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(visible)

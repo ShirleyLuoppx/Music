@@ -41,7 +41,6 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
     private val musicController = MusicController.instance
     private val musicRepository = MusicRepository()
     private lateinit var stylusRotate: RotateAnimation
-    private lateinit var rotateAnimator: ObjectAnimator
     private val recordSet = AnimatorSet()
 
     //当前播放歌曲的毫秒数
@@ -300,7 +299,7 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
      */
     private fun execAnim() {
         // 创建从0度到360度的旋转动画，耗时3秒
-        rotateAnimator = ObjectAnimator.ofFloat(binding.spiMusicRotate, "rotation", 0f, 360f)
+        val rotateAnimator = ObjectAnimator.ofFloat(binding.spiMusicRotate, "rotation", 0f, 360f)
         rotateAnimator.repeatCount = ObjectAnimator.INFINITE // 无限循环播放
         rotateAnimator.interpolator = LinearInterpolator() // 匀速旋转
         rotateAnimator.setDuration(20 * 1000)

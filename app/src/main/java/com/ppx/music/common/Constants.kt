@@ -12,6 +12,8 @@ class Constants {
 
         var CODE_SUCCESS = 200
 //        var CODE_FAIL = 400
+
+        const val MV_INFO = "MV_INFO"
     }
 }
 

@@ -23,7 +23,7 @@ class MVRepository {
         }
     }
 
-    suspend fun getTopMv() :ArrayList<MvInfo> {
+    suspend fun getTopMv(): ArrayList<MvInfo> {
         val str = networkService.getTopMV().toString()
         return analyzeTopMv(str)
 //        if (mvList.size > 0) {
@@ -49,10 +49,20 @@ class MVRepository {
                 val mvid = dataStr["id"]
                 val cover = dataStr["cover"]
                 val name = dataStr["name"]
+                val artistName = dataStr["artistName"]
+                val artistId = dataStr["artistId"]
                 val playCount = dataStr["playCount"]
 //                LogUtils.d(TAG, "getTopMv: mvId: $mvid")
 //                LogUtils.d(TAG, "getTopMv: cover: $cover")
-                val mvInfo = MvInfo(mvid.toString(), cover.toString(), name.toString(), playCount.toString().toInt())
+                val mvInfo = MvInfo(
+                    mvid.toString(),
+                    cover.toString(),
+                    name.toString(),
+                    artistName.toString(),
+                    artistId.toString(),
+                    playCount.toString().toInt(),
+                    ""
+                )
                 mvList.add(mvInfo)
             }
         } else {
@@ -61,7 +71,7 @@ class MVRepository {
         return mvList
     }
 
-    suspend fun getMVUrlById(id: String):String {
+    suspend fun getMVUrlById(id: String): String {
         val str = networkService.getMVUrlById(id).toString()
         return analyzeMVUrl(str)
     }
