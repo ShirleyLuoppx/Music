@@ -30,10 +30,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".player.MediaService" />
-        <service android:name=".player.MusicService" />
         <service android:name=".player.MusicPlayerService" />
-        <service android:name=".player.DBMusicPlayer" />
         <!--<activity android:name=".view.LoginActivity"/>-->
         <activity android:name=".view.BaseActivity" />
         <activity android:name=".view.MusicPlayerActivity" />

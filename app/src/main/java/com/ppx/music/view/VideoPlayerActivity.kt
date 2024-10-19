@@ -1,6 +1,5 @@
 package com.ppx.music.view
 
-import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.net.Uri
@@ -11,7 +10,6 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.WindowInsets
 import android.view.WindowInsetsController
-import android.view.WindowManager
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityVideoPlayerBinding
 import com.ppx.music.utils.LogUtils
