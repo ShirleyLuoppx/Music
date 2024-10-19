@@ -2,7 +2,6 @@ package com.ppx.music.view
 
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -12,12 +11,8 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityVideoPlayerBinding
+import com.ppx.music.player.VideoController
 import com.ppx.music.utils.LogUtils
-import tv.danmaku.ijk.media.player.IMediaPlayer
-import tv.danmaku.ijk.media.player.IMediaPlayer.OnCompletionListener
-import tv.danmaku.ijk.media.player.IMediaPlayer.OnErrorListener
-import tv.danmaku.ijk.media.player.IMediaPlayer.OnPreparedListener
-import tv.danmaku.ijk.media.player.IjkMediaPlayer
 
 /**
  *
@@ -26,16 +21,16 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer
  * @Desc：视频播放页
  */
 class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceHolder.Callback,
-    OnPreparedListener, OnCompletionListener, OnErrorListener, OnClickListener {
+    OnClickListener {
 
 
     private var videoPath = ""
     private var surfaceView: SurfaceView? = null
-    private val ijkMediaPlayer = IjkMediaPlayer()
     private var screenWidth = 0
     private var screenHeight = 0
 
     //TODO：ijkMediaPlayer的逻辑  单独拿出来写一个VideoPlayer
+    private var videoController: VideoController? = null
 
     override fun getLayoutId(): Int {
         return R.layout.activity_video_player
@@ -52,49 +47,29 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
             finish()
         }
         surfaceView?.holder?.addCallback(this)
-        ijkMediaPlayer.setOnPreparedListener(this)
-        ijkMediaPlayer.setOnCompletionListener(this)
-        ijkMediaPlayer.setOnErrorListener(this)
         binding.ivPause.setOnClickListener(this)
-    }
-
-    override fun onClick(view: View?) {
-        when (view?.id) {
-            R.id.iv_pause -> {
-                if (ijkMediaPlayer.isPlaying) {
-                    ijkMediaPlayer.pause()
-                } else {
-                    ijkMediaPlayer.start()
-                }
-            }
-        }
     }
 
     override fun initData() {
         videoPath = intent.getStringExtra("playUrl").toString()
         LogUtils.d(TAG, "initData: videoPath: $videoPath")
+        videoController = VideoController()
+    }
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.iv_pause -> {
+                videoController?.pauseOrStart()
+            }
+        }
     }
 
     override fun destroyView() {
-        if (ijkMediaPlayer.isPlaying) {
-            ijkMediaPlayer.stop()
-        }
-        ijkMediaPlayer.reset()
-        ijkMediaPlayer.release()
-    }
-
-    override fun onStop() {
-        super.onStop()
+        videoController?.release()
     }
 
     override fun surfaceCreated(p0: SurfaceHolder) {
-        LogUtils.d(TAG, "surfaceCreated: p0: $p0")
-        LogUtils.d(TAG, "surfaceCreated: : $requestedOrientation")
-
-        ijkMediaPlayer.reset()
-        ijkMediaPlayer.setDisplay(p0)
-        ijkMediaPlayer.setDataSource(this, Uri.parse(videoPath))
-        ijkMediaPlayer.prepareAsync()
+        videoController?.setDataSource(p0, videoPath)
 
         screenWidth = windowManager.defaultDisplay.width
         screenHeight = windowManager.defaultDisplay.height
@@ -108,27 +83,7 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
 
     override fun surfaceDestroyed(p0: SurfaceHolder) {
         LogUtils.d(TAG, "surfaceDestroyed: ")
-        if (ijkMediaPlayer != null) {
-            if (ijkMediaPlayer.isPlaying) {
-                ijkMediaPlayer.stop()
-            }
-            ijkMediaPlayer.release()
-        }
-    }
-
-    override fun onPrepared(p0: IMediaPlayer?) {
-        LogUtils.d(TAG, "onPrepared: ")
-        // 播放器准备完成回调，可以开始播放
-        ijkMediaPlayer.start()
-    }
-
-    override fun onCompletion(p0: IMediaPlayer?) {
-        LogUtils.d(TAG, "onCompletion: ")
-    }
-
-    override fun onError(p0: IMediaPlayer?, p1: Int, p2: Int): Boolean {
-        LogUtils.d(TAG, "onError: p1: $p1, p2: $p2")
-        return false
+        videoController?.release()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
