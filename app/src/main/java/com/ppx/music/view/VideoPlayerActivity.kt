@@ -1,11 +1,9 @@
 package com.ppx.music.view
 
-import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -40,6 +38,7 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
     private var screenWidth = 0
     private var screenHeight = 0
     private var videoController: VideoController? = null
+    private var isFullScreen: Boolean = false
 
     override fun getLayoutId(): Int {
         return R.layout.activity_video_player
@@ -50,11 +49,11 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
     }
 
     override fun initListener() {
-        binding.ivBack.setOnClickListener {
-            finish()
-        }
+        binding.ivBack.setOnClickListener(this)
         surfaceView?.holder?.addCallback(this)
         binding.ivPause.setOnClickListener(this)
+        binding.ivFullscreen.setOnClickListener(this)
+        surfaceView?.setOnClickListener(this)
     }
 
     @SuppressLint("SetTextI18n")
@@ -88,8 +87,33 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
 
     override fun onClick(view: View?) {
         when (view?.id) {
+            R.id.iv_back -> {
+                if (isFullScreen) {
+                    setRate(1)
+                } else {
+                    finish()
+                }
+            }
+
             R.id.iv_pause -> {
                 videoController?.pauseOrStart()
+            }
+
+            R.id.iv_fullscreen -> {
+                if (isFullScreen) {
+                    setRate(1)
+                } else {
+                    setRate(2)
+                }
+            }
+
+            R.id.sf_surfaceview -> {
+                videoController?.pauseOrStart()
+                if (videoController?.isPlaying() == true) {
+                    binding.ivPauseWhenClick.visibility = View.VISIBLE
+                } else {
+                    binding.ivPauseWhenClick.visibility = View.GONE
+                }
             }
         }
     }
@@ -122,7 +146,7 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
         LogUtils.d(
             TAG,
             "onConfigurationChanged: ${ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE}"
-        ) //竖屏:SCREEN_ORIENTATION_PORTRAIT = 0   SCREEN_ORIENTATION_LANDSCAPE = 1横屏
+        )
         setRate(newConfig.orientation)
     }
 
@@ -137,11 +161,21 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
         setSystemUIStatus(orientation == 1)
 
         if (orientation == 1) {
+            isFullScreen = false
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             surfaceView?.layoutParams?.width = screenWidth
             surfaceView?.layoutParams?.height = screenWidth * 9 / 16  //0.5625   0.75
+            binding.clVideoInfo.visibility = View.VISIBLE
+            binding.ivFullscreen.setImageResource(R.mipmap.ic_fullscreen)
+
         } else if (orientation == 2) {
+            isFullScreen = true
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
             surfaceView?.layoutParams?.width = screenWidth * 16 / 9
             surfaceView?.layoutParams?.height = screenWidth  //0.5625   0.75
+            binding.clVideoInfo.visibility = View.GONE
+            binding.ivFullscreen.setImageResource(R.mipmap.ic_not_fullscreen)
             LogUtils.d(
                 TAG,
                 "setRate: when orientation == land height = ${surfaceView?.layoutParams?.height}"
@@ -156,7 +190,7 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
      */
     private fun setSystemUIStatus(visible: Boolean) {
         //设置状态栏和导航栏的背景色为黑色
-        if(visible){
+        if (visible) {
             window.statusBarColor = ContextCompat.getColor(this, R.color.black) // 设置状态栏颜色
             window.navigationBarColor = ContextCompat.getColor(this, R.color.black) // 设置导航栏颜色
         }

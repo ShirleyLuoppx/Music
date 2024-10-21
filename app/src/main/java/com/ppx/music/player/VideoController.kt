@@ -2,7 +2,6 @@ package com.ppx.music.player
 
 import android.net.Uri
 import android.view.SurfaceHolder
-import com.bumptech.glide.Glide.init
 import com.ppx.music.MusicApplication
 import com.ppx.music.utils.LogUtils
 import tv.danmaku.ijk.media.player.IMediaPlayer
@@ -76,8 +75,8 @@ class VideoController : IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompleti
         ijkMediaPlayer.seekTo(seekTo)
     }
 
-    fun isPlaying() {
-        ijkMediaPlayer.isPlaying
+    fun isPlaying(): Boolean {
+        return ijkMediaPlayer.isPlaying
     }
 
     fun setDataSource(p0: SurfaceHolder, url: String) {
