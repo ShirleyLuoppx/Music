@@ -61,7 +61,6 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
     override fun initView() {
         execAnim()
         handlerUpdateTimeUI()
-        getMainColor()
     }
 
     override fun initListener() {
@@ -95,7 +94,7 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
                 initSongData(clickSongDetailInfo!!)
             }
         } catch (e: Exception) {
-            LogUtils.d( TAG, "initData Exception = $e")
+            LogUtils.d(TAG, "initData Exception = $e")
             e.printStackTrace()
         }
     }
@@ -266,6 +265,8 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
         binding.tvTotalTime.text = timeStr
         binding.tvVipStatus.visibility =
             if (songData.songVipStatus == SongVipStatus.FREE || songData.songVipStatus == SongVipStatus.ALL_CAN_PLAY) View.GONE else View.VISIBLE
+
+//        getMainColor()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -322,41 +323,50 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
         binding.ivStylus.startAnimation(stylusRotate)
     }
 
+    override fun onResume() {
+        super.onResume()
+        getMainColor()
+    }
+
     //通过palette 获取歌曲封面的主色调设置为本activity的背景色
     private fun getMainColor() {
 
-        val bitmap = (BitmapDrawable(binding.spiMusicRotate.drawable.toBitmap())).bitmap
-        lifecycleScope.launch {
+        val drawable = binding.spiMusicRotate.drawable
+        if (drawable != null) {
+            val bitmap = drawable.toBitmap()
+            if (bitmap != null) {
+                // 异步方式获取
+                Palette.from(bitmap).generate { palette ->
 
+                    LogUtils.d(TAG, "getMainColor palette = $palette")
 
-            // 异步方式获取
-            Palette.from(bitmap).generate(PaletteAsyncListener { palette ->
-                if (palette != null) {
-                    val vibrant = palette.vibrantSwatch //有活力的
-                    val vibrantDark = palette.darkVibrantSwatch //有活力的暗色
-                    val vibrantLight = palette.lightVibrantSwatch //有活力的亮色
+                    if (palette != null) {
+                        val vibrant = palette.vibrantSwatch //有活力的
+                        val vibrantDark = palette.darkVibrantSwatch //有活力的暗色
+                        val vibrantLight = palette.lightVibrantSwatch //有活力的亮色
 
-                    val muted = palette.mutedSwatch //柔和的
-                    val mutedDark = palette.darkMutedSwatch //柔和的暗色
-                    val mutedLight = palette.lightMutedSwatch //柔和的亮色
+                        val muted = palette.mutedSwatch //柔和的
+                        val mutedDark = palette.darkMutedSwatch //柔和的暗色
+                        val mutedLight = palette.lightMutedSwatch //柔和的亮色
 
-                    val population = vibrant?.population //样本中的像素数量
-                    val rgb = vibrant?.rgb //颜色的RBG值
-                    val hsl = vibrant?.getHsl() //颜色的HSL值
-                    val bodyTextColor = vibrant?.getBodyTextColor() //主体文字的颜色值
-                    val titleTextColor = vibrant?.getTitleTextColor() //标题文字的颜色值
+                        val population = vibrant?.population //样本中的像素数量
+                        val rgb = vibrant?.rgb //颜色的RBG值
+                        val hsl = vibrant?.getHsl() //颜色的HSL值
+                        val bodyTextColor = vibrant?.getBodyTextColor() //主体文字的颜色值
+                        val titleTextColor = vibrant?.getTitleTextColor() //标题文字的颜色值
 
-//                    lifecycleScope.launch {
-//                        binding.clPlayMusic.setBackgroundColor(rgb!!)
-//                    }
-                    binding.tvSingerName.setBackgroundColor(rgb!!)
+                        binding.tvSingerName.setBackgroundColor(rgb!!)
+                        LogUtils.d(TAG, "palette rgb = $rgb")
 
-                    LogUtils.d(TAG, "palette rgb = $rgb")
-
-                } else {
-                    LogUtils.d(TAG, "palette is null")
+                    } else {
+                        LogUtils.d(TAG, "palette is null")
+                    }
                 }
-            })
+            } else {
+                LogUtils.d(TAG, "getMainColor bitmap is null")
+            }
+        } else {
+            LogUtils.d(TAG, "getMainColor drawable is null")
         }
     }
 
