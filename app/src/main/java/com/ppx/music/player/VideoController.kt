@@ -71,8 +71,8 @@ class VideoController : IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompleti
         ijkMediaPlayer.release()
     }
 
-    fun seekTo(seekTo: Long) {
-        ijkMediaPlayer.seekTo(seekTo)
+    fun seekTo(seekTo: Int) {
+        ijkMediaPlayer.seekTo(seekTo.toLong())
     }
 
     fun isPlaying(): Boolean {

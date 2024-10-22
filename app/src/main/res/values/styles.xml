@@ -16,4 +16,11 @@
         <item name="cornerSize">15dp</item>
     </style>
 
+    <!-- styles.xml -->
+    <style name="CustomSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="colorAccent">#FF4081</item> <!-- 已走过的进度颜色 -->
+        <item name="android:progressTint">#009688</item> <!-- 未到的进度颜色 -->
+    </style>
+
+
 </resources>

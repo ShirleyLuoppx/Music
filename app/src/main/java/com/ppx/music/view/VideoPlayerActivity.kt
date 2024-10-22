@@ -5,6 +5,9 @@ import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
@@ -12,6 +15,8 @@ import android.view.View.OnClickListener
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.animation.LinearInterpolator
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
@@ -21,6 +26,7 @@ import com.ppx.music.databinding.ActivityVideoPlayerBinding
 import com.ppx.music.model.MvInfo
 import com.ppx.music.player.VideoController
 import com.ppx.music.utils.LogUtils
+import com.ppx.music.utils.NumberTransUtils
 
 /**
  *
@@ -29,7 +35,7 @@ import com.ppx.music.utils.LogUtils
  * @Desc：视频播放页
  */
 class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceHolder.Callback,
-    OnClickListener {
+    OnClickListener,OnSeekBarChangeListener {
 
     private val TAG = "VideoPlayerActivity"
     private var mvInfo: MvInfo? = null
@@ -40,12 +46,21 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
     private var videoController: VideoController? = null
     private var isFullScreen: Boolean = false
 
+    //当前播放歌曲的毫秒数
+    private var currSongMillsTime = 0
+
+    //发送message id更改播放时间显示和进度条显示
+    private val MSG_UPDATE_TIME = 1001
+    private lateinit var handler: Handler
+    private lateinit var message: Message
+
     override fun getLayoutId(): Int {
         return R.layout.activity_video_player
     }
 
     override fun initView() {
         surfaceView = binding.sfSurfaceview
+        handlerUpdateTimeUI()
     }
 
     override fun initListener() {
@@ -54,6 +69,7 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
         binding.ivPause.setOnClickListener(this)
         binding.ivFullscreen.setOnClickListener(this)
         surfaceView?.setOnClickListener(this)
+        binding.sbVideoSeekbar.setOnSeekBarChangeListener(this)
     }
 
     @SuppressLint("SetTextI18n")
@@ -65,17 +81,18 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
         if (mvInfo != null) {
             videoPath = mvInfo?.playUrl.toString()
             LogUtils.d(TAG, "initData: videoPath: $videoPath")
+            Glide.with(this).load(mvInfo?.cover).into(binding.ivMvCover)
+            binding.tvSongSingerName.text = mvInfo?.songName + " - " + mvInfo?.singerName
+            binding.tvSongName.text = mvInfo?.songName
+            binding.tvSingerName.text = mvInfo?.singerName
+            binding.sbVideoSeekbar.progress = 0
+            binding.sbVideoSeekbar.max = (mvInfo?.duration!! / 1000)
         } else {
             LogUtils.d(TAG, "initData: mvInfo is null")
         }
 
-        Glide.with(this).load(mvInfo?.cover).into(binding.ivMvCover)
-        binding.tvSongSingerName.text = mvInfo?.songName + " - " + mvInfo?.singerName
         binding.tvSongSingerName.isSelected = true
         binding.tvSongSingerName.requestFocus()
-
-        binding.tvSongName.text = mvInfo?.songName
-        binding.tvSingerName.text = mvInfo?.singerName
 
         //TODO:所有的动画都可以单独抽取出来，放到一个动画的工具类里面
         val rotateAnimator = ObjectAnimator.ofFloat(binding.ivMvCover, "rotation", 0f, 360f)
@@ -111,8 +128,16 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
                 videoController?.pauseOrStart()
                 if (videoController?.isPlaying() == true) {
                     binding.ivPauseWhenClick.visibility = View.VISIBLE
+                    if (handler.hasMessages(MSG_UPDATE_TIME)) {
+                        handler.removeMessages(MSG_UPDATE_TIME)
+                    }
+
                 } else {
                     binding.ivPauseWhenClick.visibility = View.GONE
+                    if (handler.hasMessages(MSG_UPDATE_TIME)) {
+                        handler.removeMessages(MSG_UPDATE_TIME)
+                    }
+                    handler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000)
                 }
             }
         }
@@ -148,6 +173,19 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
             "onConfigurationChanged: ${ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE}"
         )
         setRate(newConfig.orientation)
+    }
+
+    override fun onProgressChanged(p0: SeekBar?, progress: Int, fromUser: Boolean) {
+        if (fromUser) {
+            videoController?.seekTo(progress * 1000)
+            currSongMillsTime = progress * 1000
+        }
+    }
+
+    override fun onStartTrackingTouch(p0: SeekBar?) {
+    }
+
+    override fun onStopTrackingTouch(p0: SeekBar?) {
     }
 
     /**
@@ -216,4 +254,30 @@ class VideoPlayerActivity : BaseActivity<ActivityVideoPlayerBinding>(), SurfaceH
                     or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
         }
     }
+
+    /**
+     * 更新当前播放时间、和progress进度显示
+     */
+    private fun handlerUpdateTimeUI() {
+        handler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                super.handleMessage(msg)
+                when (msg.what) {
+                    MSG_UPDATE_TIME -> {
+//                        LogUtils.d("handleMessage currSongMillsTime = $currSongMillsTime")
+                        currSongMillsTime += 1000
+//                        binding.tvCurrTime.text =
+//                            NumberTransUtils.long2Minutes(currSongMillsTime.toLong())
+                        binding.sbVideoSeekbar.progress = currSongMillsTime / 1000
+                        handler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000)
+                    }
+                }
+            }
+        }
+
+        message = handler.obtainMessage()
+        message.what = MSG_UPDATE_TIME
+        handler.sendMessage(message)
+    }
+
 }

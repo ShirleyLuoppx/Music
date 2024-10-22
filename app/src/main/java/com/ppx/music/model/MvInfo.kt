@@ -11,5 +11,6 @@ data class MvInfo(
     val singerName: String,
     val singerId: String,
     val playCount: Int,
-    var playUrl:String
+    var playUrl:String,
+    val duration: Int
 ) : Parcelable

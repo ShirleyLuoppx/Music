@@ -52,7 +52,13 @@ class MVRepository {
                 val artistName = dataStr["artistName"]
                 val artistId = dataStr["artistId"]
                 val playCount = dataStr["playCount"]
-//                LogUtils.d(TAG, "getTopMv: mvId: $mvid")
+                //duration
+                val mv = dataStr["mv"]
+                val videos = JSONObject.parseObject(mv.toString())["videos"]
+                val videoStr = JSONObject.parseArray(videos.toString())[0]
+                val duration = JSONObject.parseObject(videoStr.toString())["duration"]
+//                LogUtils.d(TAG, "getTopMv: name: $name")
+//                LogUtils.d(TAG, "getTopMv: duration: $duration")
 //                LogUtils.d(TAG, "getTopMv: cover: $cover")
                 val mvInfo = MvInfo(
                     mvid.toString(),
@@ -61,7 +67,8 @@ class MVRepository {
                     artistName.toString(),
                     artistId.toString(),
                     playCount.toString().toInt(),
-                    ""
+                    "",
+                    duration.toString().toInt()
                 )
                 mvList.add(mvInfo)
             }
