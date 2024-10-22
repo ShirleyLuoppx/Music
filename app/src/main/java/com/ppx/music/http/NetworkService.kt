@@ -17,29 +17,33 @@ interface NetworkService {
     suspend fun sendVerifyCode(
         @Query(value = "phone") phone: String,
         @Query(value = "timestamp") timestamp: String
-    ): String
+    ): JSONObject
 
-    @GET("/song/url")
+    @POST("/song/url")
     suspend fun getNewsService(@Query(value = "id") id: String): JSONObject
+
+    //通过mv的id获取到mv的播放路径
+    @POST("/mv/url")
+    suspend fun getMVUrlById(@Query(value = "id") id: String): JSONObject
 
     @POST("/captcha/verify")
     suspend fun checkVerifyCode(
         @Query(value = "phone") phone: String,
         @Query(value = "captcha") captcha: String,
         @Query(value = "timestamp") timestamp: String
-    ): String
+    ): JSONObject
 
     @POST("/cellphone/existence/check")
     suspend fun checkPhone(
         @Query(value = "phone") phone: String,
         @Query(value = "timestamp") timestamp: String
-    ): String
+    ): JSONObject
 
     @GET("/user/detail")
-    suspend fun getUserDetail(@Query(value = "uid") uid: String): String
+    suspend fun getUserDetail(@Query(value = "uid") uid: String): JSONObject
 
     @GET("/get/userids")
-    suspend fun getUserIdByNickName(@Query(value = "nicknames") nicknames: String): String
+    suspend fun getUserIdByNickName(@Query(value = "nicknames") nicknames: String): JSONObject
 
     //获取每日推荐歌曲
     @GET("/recommend/songs")
@@ -61,13 +65,6 @@ interface NetworkService {
     @GET("/top/mv")
     suspend fun getTopMV(): JSONObject
 
-    //通过mv的id获取到mv的播放路径
-    @POST("/mv/url")
-    suspend fun getMVUrlById(@Query(value = "id") id: String): JSONObject
-
-    //获取每日推荐歌曲列表
-    @POST("/recommend/songs")
-    suspend fun getDailyRecommendSongList(): JSONObject
 
 
     companion object {

@@ -13,6 +13,7 @@ import com.ppx.music.model.SongVipStatus
 import com.ppx.music.player.MusicController
 import com.ppx.music.player.MusicPlayerService
 import com.ppx.music.utils.LogUtils
+import java.math.BigDecimal
 
 /**
  *
@@ -26,12 +27,17 @@ class MusicRepository {
     private val networkService = NetworkService.createService()
 
     suspend fun getSongUrlById(id: String): String {
-        var songUrl = ""
         LogUtils.d(TAG, "getSongUrlById id = $id")
+        //将科学计数法的id转为string类型字符串，要不然会报404
+        val idStr = BigDecimal(id).toPlainString()
+        LogUtils.d(TAG, "getSongUrlById idStr = $idStr")
+        val newsEntity = networkService.getNewsService(idStr)
+        return analysisSongUrlById(newsEntity.toString())
+    }
 
-        val newsEntity = networkService.getNewsService(id)
-
-        val jsonObjectStr = JSONObject.parseObject(newsEntity.toString())
+    private fun analysisSongUrlById(str: String): String {
+        var songUrl = ""
+        val jsonObjectStr = JSONObject.parseObject(str)
         val dataStr = jsonObjectStr["data"].toString()
         val dataArray = JSONObject.parseArray(dataStr)
         if (dataArray.size > 0) {
@@ -55,6 +61,7 @@ class MusicRepository {
             val intent = Intent(MusicApplication.context, MusicPlayerService::class.java)
             intent.putExtra("url", url)
             intent.setAction("PLAY")
+            MusicApplication.context.stopService(intent)
             MusicApplication.context.startService(intent)
         }
     }
@@ -167,7 +174,7 @@ class MusicRepository {
                 for (arInfo in arArray) {
                     val singleArStr = JSONObject.parseObject(arInfo.toString())
                     val singerName = singleArStr["name"].toString()
-                    LogUtils.d("onResponse : when songName = $songName , singerName = $singerName")
+//                    LogUtils.d("onResponse : when songName = $songName , singerName = $singerName")
                     singersList.add(singerName)
                 }
 

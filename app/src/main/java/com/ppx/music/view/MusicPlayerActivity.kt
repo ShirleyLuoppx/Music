@@ -3,6 +3,7 @@ package com.ppx.music.view
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -15,7 +16,10 @@ import android.view.animation.RotateAnimation
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.annotation.RequiresApi
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
+import androidx.palette.graphics.Palette
+import androidx.palette.graphics.Palette.PaletteAsyncListener
 import com.bumptech.glide.Glide
 import com.ppx.music.R
 import com.ppx.music.databinding.ActivityMusicPlayerBinding
@@ -57,6 +61,7 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
     override fun initView() {
         execAnim()
         handlerUpdateTimeUI()
+        getMainColor()
     }
 
     override fun initListener() {
@@ -78,15 +83,20 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
             intent.getParcelableExtra("clickSongDetailInfo")
         LogUtils.d(TAG, "initData clickSongDetailInfo = $clickSongDetailInfo")
 
-        if (clickSongDetailInfo != null) {
-            val clickSongId = clickSongDetailInfo?.songId
-            if (clickSongId != null) {
-                lifecycleScope.launch {
-                    musicRepository.getSongUrlById(clickSongId)
+        try {
+            if (clickSongDetailInfo != null) {
+                val clickSongId = clickSongDetailInfo?.songId
+                if (clickSongId != null) {
+                    lifecycleScope.launch {
+                        musicRepository.getSongUrlById(clickSongId)
+                    }
                 }
-            }
 
-            initSongData(clickSongDetailInfo!!)
+                initSongData(clickSongDetailInfo!!)
+            }
+        } catch (e: Exception) {
+            LogUtils.d( TAG, "initData Exception = $e")
+            e.printStackTrace()
         }
     }
 
@@ -172,7 +182,7 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
             binding.ivPlaySong.setImageResource(R.mipmap.ic_play)
             recordSet.pause()
             stylusAnim(0)
-            if(handler.hasMessages(MSG_UPDATE_TIME)){
+            if (handler.hasMessages(MSG_UPDATE_TIME)) {
                 handler.removeMessages(MSG_UPDATE_TIME)
             }
         } else {
@@ -180,7 +190,7 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
             binding.ivPlaySong.setImageResource(R.mipmap.ic_pause)
             recordSet.resume()
             stylusAnim(1)
-            if(handler.hasMessages(MSG_UPDATE_TIME)){
+            if (handler.hasMessages(MSG_UPDATE_TIME)) {
                 handler.removeMessages(MSG_UPDATE_TIME)
             }
             handler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000)
@@ -312,6 +322,43 @@ class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickL
         binding.ivStylus.startAnimation(stylusRotate)
     }
 
+    //通过palette 获取歌曲封面的主色调设置为本activity的背景色
+    private fun getMainColor() {
+
+        val bitmap = (BitmapDrawable(binding.spiMusicRotate.drawable.toBitmap())).bitmap
+        lifecycleScope.launch {
+
+
+            // 异步方式获取
+            Palette.from(bitmap).generate(PaletteAsyncListener { palette ->
+                if (palette != null) {
+                    val vibrant = palette.vibrantSwatch //有活力的
+                    val vibrantDark = palette.darkVibrantSwatch //有活力的暗色
+                    val vibrantLight = palette.lightVibrantSwatch //有活力的亮色
+
+                    val muted = palette.mutedSwatch //柔和的
+                    val mutedDark = palette.darkMutedSwatch //柔和的暗色
+                    val mutedLight = palette.lightMutedSwatch //柔和的亮色
+
+                    val population = vibrant?.population //样本中的像素数量
+                    val rgb = vibrant?.rgb //颜色的RBG值
+                    val hsl = vibrant?.getHsl() //颜色的HSL值
+                    val bodyTextColor = vibrant?.getBodyTextColor() //主体文字的颜色值
+                    val titleTextColor = vibrant?.getTitleTextColor() //标题文字的颜色值
+
+//                    lifecycleScope.launch {
+//                        binding.clPlayMusic.setBackgroundColor(rgb!!)
+//                    }
+                    binding.tvSingerName.setBackgroundColor(rgb!!)
+
+                    LogUtils.d(TAG, "palette rgb = $rgb")
+
+                } else {
+                    LogUtils.d(TAG, "palette is null")
+                }
+            })
+        }
+    }
 
 }
 

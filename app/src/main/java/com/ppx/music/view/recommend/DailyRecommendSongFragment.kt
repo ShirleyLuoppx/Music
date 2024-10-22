@@ -11,9 +11,9 @@ import com.ppx.music.R
 import com.ppx.music.adapter.DailyRecommendSongAdapter
 import com.ppx.music.databinding.FragmentDailyRecommendBinding
 import com.ppx.music.http.MusicRepository
+import com.ppx.music.model.SongDetailInfo
 import com.ppx.music.player.MusicController
 import com.ppx.music.utils.CommonUtils
-import com.ppx.music.utils.LogUtils
 import com.ppx.music.view.BaseFragment
 import com.ppx.music.view.MusicPlayerActivity
 import kotlinx.coroutines.launch
@@ -27,9 +27,10 @@ import kotlin.random.Random
  */
 class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>() {
 
-
+    private val TAG = "DailyRecommendSongFragment"
     private val dailyRecommendAdapter = DailyRecommendSongAdapter()
     private val musicRepository = MusicRepository()
+    private var musicList: ArrayList<SongDetailInfo> = ArrayList()
 
     override fun initView() {
 
@@ -43,10 +44,6 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
             MusicController.instance.setCurrentSongIndex(position)
 
             val clickSongDetailInfo = adapter.getItem(position)
-            val clickSongId = clickSongDetailInfo?.songId
-            val clickSongName = clickSongDetailInfo?.songName
-            LogUtils.d("onItemClick $position and clickSongId = $clickSongId and clickSongName = $clickSongName")
-
             val intent = Intent(requireActivity(), MusicPlayerActivity::class.java)
             intent.putExtra("clickSongDetailInfo", clickSongDetailInfo)
             startActivity(intent)
@@ -64,11 +61,10 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
     override fun initData() {
 
         lifecycleScope.launch {
-            val data = musicRepository.getDailyRecommendSongList()
-            dailyRecommendAdapter.addAll(data)
-
+            musicList = musicRepository.getDailyRecommendSongList()
+            dailyRecommendAdapter.addAll(musicList)
             Glide.with(this@DailyRecommendSongFragment)
-                .load(data[Random.nextInt(0, data.size)].picUrl)
+                .load(musicList[Random.nextInt(0, musicList.size)].picUrl)
                 .into(binding.ivTopBg)
         }
 
