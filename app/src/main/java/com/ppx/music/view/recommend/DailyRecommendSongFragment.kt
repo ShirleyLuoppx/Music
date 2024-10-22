@@ -1,6 +1,11 @@
 package com.ppx.music.view.recommend
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONObject
 import com.bumptech.glide.Glide
@@ -49,13 +54,8 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
             val clickSongName = clickSongDetailInfo?.songName
             LogUtils.d("onItemClick $position and clickSongId = $clickSongId and clickSongName = $clickSongName")
 
-            //跳转到播放页面
-//            val transaction = activity?.supportFragmentManager?.beginTransaction()
-//            transaction?.replace(R.id.framelayout,this)
-//            transaction?.commit()
-
             val intent = Intent(requireActivity(), MusicPlayerActivity::class.java)
-            intent.putExtra("clickSongDetailInfo",clickSongDetailInfo)
+            intent.putExtra("clickSongDetailInfo", clickSongDetailInfo)
             startActivity(intent)
         }
 
@@ -63,14 +63,33 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
             val fragmentManager = activity?.supportFragmentManager
             val transaction = fragmentManager?.beginTransaction()
             fragmentManager?.popBackStack()
-//            transaction?.replace(R.id.framelayout,RecommendFragment())
             transaction?.commit()
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun initData() {
         getDailyRecommendSongs()
-//       val data  = dailyRecommendViewModel.getDailyRecommendSongs()
+
+        //获取当前的月/日
+        val currentDate = java.util.Calendar.getInstance()
+        val month = currentDate.get(java.util.Calendar.MONTH) + 1
+        val day = currentDate.get(java.util.Calendar.DAY_OF_MONTH)
+
+        val sbString = SpannableString("$day / $month")
+        sbString.setSpan(
+            AbsoluteSizeSpan(50, true),
+            0,
+            month.toString().length,
+            SpannableString.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        sbString.setSpan(
+            AbsoluteSizeSpan(13, true),
+            month.toString().length,
+            day.toString().length,
+            SpannableString.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        binding.tvDate.text = sbString
     }
 
     override fun getLayoutId(): Int {
@@ -103,11 +122,10 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
                     if (data.size > 0) {
                         activity?.runOnUiThread {
                             dailyRecommendAdapter.addAll(data)
-//                            dailyRecommendAdapter.notifyDataSetChanged()
 
                             Glide.with(this@DailyRecommendSongFragment)
-                               .load(data[Random.nextInt(0, data.size)].picUrl)
-                               .into(binding.ivTopBg)
+                                .load(data[Random.nextInt(0, data.size)].picUrl)
+                                .into(binding.ivTopBg)
                         }
                     }
                 }
@@ -168,16 +186,20 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
                 //点赞数量
                 //讨论数量
 
-                val songDetailInfo = SongDetailInfo(songId, songName, singersList, alName, picUrl,songVipStatus,songTime)
+                val songDetailInfo = SongDetailInfo(
+                    songId,
+                    songName,
+                    singersList,
+                    alName,
+                    picUrl,
+                    songVipStatus,
+                    songTime
+                )
                 songsInfoList.add(songDetailInfo)
-
-
-//                dailyRecommendAdapter.notifyDataSetChanged()
             }
 
             MusicController.instance.setMusicDataList(songsInfoList)
 
-//            Glide
         }
         return songsInfoList
     }
@@ -187,8 +209,6 @@ class DailyRecommendSongFragment : BaseFragment<FragmentDailyRecommendBinding>()
         val layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
         binding.rvDailyRecommend.layoutManager = layoutManager
         binding.rvDailyRecommend.adapter = dailyRecommendAdapter
-
-//        dailyRecommendAdapter.addAll(songsInfoList)
     }
 
     /**
