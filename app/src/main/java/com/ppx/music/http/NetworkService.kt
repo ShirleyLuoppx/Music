@@ -43,7 +43,7 @@ interface NetworkService {
 
     //获取每日推荐歌曲
     @GET("/recommend/songs")
-    suspend fun getDailyRecommendSongs(): String
+    suspend fun getDailyRecommendSongs(): JSONObject
 
     //获取每日推荐歌单
     @GET("/recommend/resource")
@@ -64,6 +64,10 @@ interface NetworkService {
     //通过mv的id获取到mv的播放路径
     @POST("/mv/url")
     suspend fun getMVUrlById(@Query(value = "id") id: String): JSONObject
+
+    //获取每日推荐歌曲列表
+    @POST("/recommend/songs")
+    suspend fun getDailyRecommendSongList(): JSONObject
 
 
     companion object {
