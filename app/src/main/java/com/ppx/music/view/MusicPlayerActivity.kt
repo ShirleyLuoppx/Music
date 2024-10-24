@@ -36,6 +36,7 @@ import org.greenrobot.eventbus.ThreadMode
 
 /**
  * 音频播放页
+ * TODO：歌词+底部小播放器显示
  */
 class MusicPlayerActivity : BaseActivity<ActivityMusicPlayerBinding>(), OnClickListener,
     OnSeekBarChangeListener {
